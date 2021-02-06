@@ -5,30 +5,62 @@ const { config, ethers } = require("hardhat");
 const { utils } = require("ethers");
 const R = require("ramda");
 
-const main = async () => {
+const deploy = async (
+  contractName,
+  _args = [],
+  overrides = {},
+  libraries = {}
+) => {
+  console.log(` 🛰  Deploying: ${contractName}`);
 
+  const contractArgs = _args || [];
+  const contractArtifacts = await ethers.getContractFactory(contractName, {
+    libraries,
+  });
+  const deployed = await contractArtifacts.deploy(...contractArgs, overrides);
+  const encoded = abiEncodeArgs(deployed, contractArgs);
+  fs.writeFileSync(`artifacts/${contractName}.address`, deployed.address);
+
+  console.log(
+    " 📄",
+    chalk.cyan(contractName),
+    "deployed to:",
+    chalk.magenta(deployed.address)
+  );
+
+  if (!encoded || encoded.length <= 2) return deployed;
+  fs.writeFileSync(`artifacts/${contractName}.args`, encoded.slice(2));
+
+  return deployed;
+};
+
+const main = async () => {
   console.log("\n\n 📡 Deploying...\n");
 
+  const yourContract = await deploy("YourContract"); // <-- add in constructor args like line 19 vvvv
+  const ConditionalTokens = await deploy("ConditionalTokens");
+  const CTHelpers = await deploy("CTHelpers");
+  // const IConditionalTokens = await deploy("IConditionalTokens")
+  const BankBucks = await deploy("BankBucks");
+  // create a vendor for the ERC20s for testing, Watchout, its been built as "Vendor in the artifacts file"
+  const BankBucksVendor = await deploy("BankBucksVendor", [BankBucks.address]);
+  // transfer BankBucks to Vendor
+  await BankBucks.transfer(BankBucksVendor.address, utils.parseEther("1000"));
 
-  const yourContract = await deploy("YourContract") // <-- add in constructor args like line 19 vvvv
-  const ConditionalTokens = await deploy("ConditionalTokens")
-  const CTHelpers = await deploy("CTHelpers")
-  //const IConditionalTokens = await deploy("IConditionalTokens")
-  const BankBucks = await deploy("BankBucks")
-  //create a vendor for the ERC20s for testing, Watchout, its been built as "Vendor in the artifacts file"
-  const BankBucksVendor = await deploy("BankBucksVendor", [BankBucks.address])
-  //transfer BankBucks to Vendor
-  await BankBucks.transfer(BankBucksVendor.address, utils.parseEther("1000"))
-  
-  const CTVendor = await deploy("CtVendor",[ConditionalTokens.address])
+  console.log("BankBucks address", BankBucks.address);
+  console.log("ConditionalTokens address", ConditionalTokens.address);
 
-  //const secondContract = await deploy("SecondContract")
+  console.log();
+  const CTVendor = await deploy("CtVendor", [
+    BankBucks.address,
+    ConditionalTokens.address,
+  ]);
+
+  // const secondContract = await deploy("SecondContract")
 
   // const exampleToken = await deploy("ExampleToken")
   // const examplePriceOracle = await deploy("ExamplePriceOracle")
   // const smartContractWallet = await deploy("SmartContractWallet",[exampleToken.address,examplePriceOracle.address])
-
-
 
   /*
   //If you want to send value to an address from the deployer
@@ -39,14 +71,12 @@ const main = async () => {
   })
   */
 
-
   /*
   //If you want to send some ETH to a contract on deploy (make your constructor payable!)
   const yourContract = await deploy("YourContract", [], {
   value: ethers.utils.parseEther("0.05")
   });
   */
-
 
   /*
   //If you want to link a library into your contract:
@@ -56,36 +86,12 @@ const main = async () => {
   });
   */
 
-
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",
     chalk.blue("packages/hardhat/artifacts/"),
     "\n\n"
   );
 };
-
-const deploy = async (contractName, _args = [], overrides = {}, libraries = {}) => {
-  console.log(` 🛰  Deploying: ${contractName}`);
-
-  const contractArgs = _args || [];
-  const contractArtifacts = await ethers.getContractFactory(contractName,{libraries: libraries});
-  const deployed = await contractArtifacts.deploy(...contractArgs, overrides);
-  const encoded = abiEncodeArgs(deployed, contractArgs);
-  fs.writeFileSync(`artifacts/${contractName}.address`, deployed.address);
-
-  console.log(
-    " 📄",
-    chalk.cyan(contractName),
-    "deployed to:",
-    chalk.magenta(deployed.address),
-  );
-
-  if (!encoded || encoded.length <= 2) return deployed;
-  fs.writeFileSync(`artifacts/${contractName}.args`, encoded.slice(2));
-
-  return deployed;
-};
-
 
 // ------ utils -------
 
@@ -110,7 +116,9 @@ const abiEncodeArgs = (deployed, contractArgs) => {
 
 // checks if it is a Solidity file
 const isSolidity = (fileName) =>
-  fileName.indexOf(".sol") >= 0 && fileName.indexOf(".swp") < 0 && fileName.indexOf(".swap") < 0;
+  fileName.indexOf(".sol") >= 0 &&
+  fileName.indexOf(".swp") < 0 &&
+  fileName.indexOf(".swap") < 0;
 
 const readArgsFile = (contractName) => {
   let args = [];
@@ -125,7 +133,7 @@ const readArgsFile = (contractName) => {
 };
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 main()

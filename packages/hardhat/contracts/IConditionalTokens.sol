@@ -6,7 +6,7 @@ import { IERC1155 } from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
 interface IConditionalTokens is IERC1155 {
 
-function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external;
+    function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external;
 
     function reportPayouts(bytes32 questionId, uint[] calldata payouts) external;
 
@@ -35,5 +35,4 @@ function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCo
     function getCollectionId(bytes32 parentCollectionId, bytes32 conditionId, uint indexSet) external view returns (bytes32);
 
     function getPositionId(IERC20 collateralToken, bytes32 collectionId) external pure returns (uint);
-
 }

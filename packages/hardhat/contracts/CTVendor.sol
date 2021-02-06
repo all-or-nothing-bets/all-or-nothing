@@ -7,43 +7,121 @@ import "./IConditionalTokens.sol";
 contract CtVendor {
     IERC20 collateral;
     IConditionalTokens conditionalTokens;
-    address public oracle;
 
-    constructor(address _conditionalTokens) public {
+    address oracle;
+    bytes32 questionId;
+    uint numOutcomes;
+    bytes32 conditionId;
+
+    mapping(bytes32 => mapping(uint => uint)) public tokenBalance;
+
+    constructor(
+        address _collateral,
+        address _conditionalTokens
+        ) public {
+        collateral = IERC20(_collateral);
         conditionalTokens = IConditionalTokens(_conditionalTokens);
-    } 
+    }
 
-    function createCondition(bytes32 _questionId, uint _amount, address _oracle) external {
-    //create condition
-    conditionalTokens.prepareCondition(
-        _oracle,
-        _questionId,
-        _amount
+    function createCondition(
+        address _oracle,
+        bytes32 _questionId,
+        uint _numOutcomes
+        ) external {
+
+        conditionalTokens.prepareCondition(
+            _oracle,
+            _questionId,
+            _numOutcomes
+        );
+
+        oracle = _oracle;
+        questionId = _questionId;
+        numOutcomes = _numOutcomes;
+        conditionId = conditionalTokens.getConditionId(
+            _oracle,
+            _questionId,
+            _numOutcomes
         );
     }
 
+    function splitCollateral(
+        // bytes32 parentCollectionId,
+        // uint[] calldata partition,
+        uint amount
+        ) external {
 
-    //split a condition with collateral
-    function splitCollateral(bytes32 _conditionId, IERC20 _collateral, bytes32 _parentCollectionId, uint[] calldata _partition, uint _amount ) external {
-        //approve collateral
-        _collateral.approve(address(conditionalTokens), _amount);
+        collateral.approve(address(conditionalTokens), amount);
 
-        //split position
+        uint[] memory partition = new uint[](2); 
+        partition[0] = 1;
+        partition[1] = 2;
+
         conditionalTokens.splitPosition(
-            _collateral,
-            _parentCollectionId,
-            _conditionId,
-            _partition,
-            _amount
+            collateral,
+            bytes32(0),  // parentCollectionId, here 0 since top-level bet
+            conditionId,
+            partition,
+            amount
         );
 
-    
+        tokenBalance[questionId][0] = amount;
+        tokenBalance[questionId][1] = amount;
+    }
 
+    // to do: add admin and control for onlyAdmin
+    // to do: add check that tokenBalance is sufficient
+    function transferTokens(
+        uint indexSet,
+        address to, // need to implement ERC1155TokenReceiver if address of smart contract
+        uint amount
+    ) external {
+        
+        bytes32 collectionId = conditionalTokens.getCollectionId(
+            bytes32(0),  // parentCollectionId, here 0 since top-level bet
+            conditionId,
+            indexSet
+        );
+    
+        uint positionId = conditionalTokens.getPositionId(
+            collateral,
+            collectionId
+        );
+
+        conditionalTokens.safeTransferFrom(
+            address(this),
+            to,
+            positionId,  // identifies conditional token
+            amount,
+            ""
+        );
+    }
+
+    function onERC1155Received(
+        address operator,
+        address from,
+        uint256 id,
+        uint256 value,
+        bytes calldata data
+        )
+        external
+        returns(bytes4) {
+            return bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"));
     }
 
 
-    //fallback
-     fallback() external payable {
-     }
+    function onERC1155BatchReceived(
+        address operator,
+        address from,
+        uint256[] calldata ids,
+        uint256[] calldata values,
+        bytes calldata data
+        )
+        external
+        returns(bytes4) {
+            return bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"));
+    }
 
+    fallback() external payable {
+    }
 }
