@@ -13,22 +13,37 @@ contract CtVendor {
         conditionalTokens = IConditionalTokens(_conditionalTokens);
     } 
 
-    function createCondition(bytes32 _questionId, uint _amount, address _oracle) external returns(bytes32){
+    function createCondition(bytes32 _questionId, uint _amount, address _oracle) external {
+    //create condition
     conditionalTokens.prepareCondition(
         _oracle,
         _questionId,
         _amount
         );
+    }
 
-        bytes32 conditionId = conditionalTokens.getConditionId(
-            _oracle,
-            _questionId,
+
+    //split a condition with collateral
+    function splitCollateral(bytes32 _conditionId, IERC20 _collateral, bytes32 _parentCollectionId, uint[] calldata _partition, uint _amount ) external {
+        //approve collateral
+        _collateral.approve(address(conditionalTokens), _amount);
+
+        //split position
+        conditionalTokens.splitPosition(
+            _collateral,
+            _parentCollectionId,
+            _conditionId,
+            _partition,
             _amount
         );
 
-        return (conditionId);
+    
 
     }
 
+
+    //fallback
+     fallback() external payable {
+     }
 
 }

@@ -11,6 +11,10 @@
     "type": "constructor"
   },
   {
+    "stateMutability": "payable",
+    "type": "fallback"
+  },
+  {
     "inputs": [
       {
         "internalType": "bytes32",
@@ -29,13 +33,7 @@
       }
     ],
     "name": "createCondition",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -50,6 +48,39 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_conditionId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_parentCollectionId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_partition",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "splitCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

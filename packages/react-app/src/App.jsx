@@ -119,6 +119,8 @@ function App(props) {
   const setPurposeEvents = useEventListener(readContracts, "YourContract", "SetPurpose", localProvider, 1);
   console.log("📟 SetPurpose events:",setPurposeEvents)
 
+  const Condition = useEventListener(readContracts, "ConditionalTokens", "ConditionPreparation", localProvider, 1 );
+  console.log("New Condition Created:", Condition[0]?.conditionId)
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
   console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
@@ -222,8 +224,6 @@ function App(props) {
               blockExplorer={blockExplorer}
             />
 
-
-           
             <Contract
               name="CTVendor"
               signer={userProvider.getSigner()}
@@ -232,7 +232,23 @@ function App(props) {
               blockExplorer={blockExplorer}
             />
 
-            
+            <Contract
+              name="BankBucks"
+              signer={userProvider.getSigner()}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+            />
+       
+            <Contract
+                name="BankBucksVendor"
+                signer={userProvider.getSigner()}
+                provider={localProvider}
+                address={address}
+                blockExplorer={blockExplorer}
+              />
+                  
+
             
 
             { /* Uncomment to display and interact with an external contract (DAI on mainnet):

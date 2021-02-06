@@ -15,6 +15,11 @@ const main = async () => {
   const CTHelpers = await deploy("CTHelpers")
   //const IConditionalTokens = await deploy("IConditionalTokens")
   const BankBucks = await deploy("BankBucks")
+  //create a vendor for the ERC20s for testing, Watchout, its been built as "Vendor in the artifacts file"
+  const BankBucksVendor = await deploy("BankBucksVendor", [BankBucks.address])
+  //transfer BankBucks to Vendor
+  await BankBucks.transfer(BankBucksVendor.address, utils.parseEther("1000"))
+  
   const CTVendor = await deploy("CtVendor",[ConditionalTokens.address])
 
   //const secondContract = await deploy("SecondContract")
