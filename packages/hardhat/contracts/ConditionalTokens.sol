@@ -1,7 +1,7 @@
 pragma solidity ^0.6.0;
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ERC1155 } from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import { CTHelpers } from "contracts/CTHelpers.sol";
+import { CTHelpers } from "./CTHelpers.sol";
 
 // Mainnet (ID: 1) canonical address: 0xC59b0e4De5F1248C1140964E0fF287B192407E0C
 // Rinkeby (ID: 4) canonical address: 0x36bede640D19981A82090519bC1626249984c908
