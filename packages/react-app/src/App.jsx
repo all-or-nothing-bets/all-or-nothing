@@ -120,7 +120,7 @@ function App(props) {
   console.log("📟 SetPurpose events:",setPurposeEvents)
 
   const Condition = useEventListener(readContracts, "ConditionalTokens", "ConditionPreparation", localProvider, 1 );
-  console.log("New Condition Created:", Condition[0]?.conditionId)
+  console.log("New Condition Created :) :", Condition[0]?.conditionId)
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
   console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
