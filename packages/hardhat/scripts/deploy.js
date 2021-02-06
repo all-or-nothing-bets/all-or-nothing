@@ -51,7 +51,7 @@ const main = async () => {
   console.log("ConditionalTokens address", ConditionalTokens.address);
 
   console.log();
-  const CTVendor = await deploy("CtVendor", [
+  const CTVendor = await deploy("CTVendor", [
     BankBucks.address,
     ConditionalTokens.address,
   ]);
