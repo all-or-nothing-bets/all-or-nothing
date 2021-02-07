@@ -1,5 +1,6 @@
 pragma solidity ^0.6.0;
 
+import "hardhat/console.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IERC1155 } from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 // import { IERC1155Receiver } from "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
@@ -15,6 +16,9 @@ contract CTVendor {
     bytes32 conditionId;
 
     mapping(bytes32 => mapping(uint => uint)) public tokenBalance;
+
+    event LogCollateralBalance(address from, uint256 balance);
+    event LogAmount(uint amount);
 
     constructor(
         address _collateral,
@@ -52,7 +56,18 @@ contract CTVendor {
         uint amount
         ) external {
 
+        emit LogAmount(amount);
+
         collateral.approve(address(conditionalTokens), amount);
+        collateral.approve(address(this), amount);
+
+        emit LogCollateralBalance(address(this), collateral.balanceOf(msg.sender));
+        emit LogCollateralBalance(msg.sender, collateral.balanceOf(msg.sender));
+
+        // collateral.transferFrom(msg.sender, address(this), amount);
+
+        // emit LogCollateralBalance(address(this), collateral.balanceOf(msg.sender));
+        // emit LogCollateralBalance(msg.sender, collateral.balanceOf(msg.sender));
 
         uint[] memory partition = new uint[](2); 
         partition[0] = 1;
@@ -66,8 +81,8 @@ contract CTVendor {
             amount
         );
 
-        tokenBalance[questionId][0] = amount;
-        tokenBalance[questionId][1] = amount;
+        // tokenBalance[questionId][0] = amount;
+        // tokenBalance[questionId][1] = amount;
     }
 
     // to do: add admin and control for onlyAdmin

@@ -7,7 +7,7 @@ import './App.css';
 import { Row, Col, Button, Menu, Alert } from 'antd';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import { formatEther, parseEther } from '@ethersproject/units';
+import { formatEther, parseEther, formatUnits } from '@ethersproject/units';
 import { useUserAddress } from 'eth-hooks';
 import {
   useExchangePrice,
@@ -53,7 +53,7 @@ const targetNetwork = NETWORKS.localhost; // <------- select your target fronten
 const DEBUG = true;
 
 // 🛰 providers
-if (DEBUG) console.log('📡 Connecting to Mainnet Ethereum');
+// if (DEBUG) console.log('📡 Connecting to Mainnet Ethereum');
 // const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
 const mainnetProvider = new JsonRpcProvider('https://mainnet.infura.io/v3/' + INFURA_ID);
@@ -63,7 +63,7 @@ const mainnetProvider = new JsonRpcProvider('https://mainnet.infura.io/v3/' + IN
 const localProviderUrl = targetNetwork.rpcUrl;
 // as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
 const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
-if (DEBUG) console.log('🏠 Connecting to provider:', localProviderUrlFromEnv);
+// if (DEBUG) console.log('🏠 Connecting to provider:', localProviderUrlFromEnv);
 const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
 
 // 🔭 block explorer URL
@@ -79,14 +79,14 @@ function App(props) {
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProvider = useUserProvider(injectedProvider, localProvider);
   const address = useUserAddress(userProvider);
-  if (DEBUG) console.log('👩‍💼 selected address:', address);
+  // if (DEBUG) console.log('👩‍💼 selected address:', address);
 
   // You can warn the user if you would like them to be on a specific network
   const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
-  if (DEBUG) console.log('🏠 localChainId', localChainId);
+  // if (DEBUG) console.log('🏠 localChainId', localChainId);
 
   const selectedChainId = userProvider && userProvider._network && userProvider._network.chainId;
-  if (DEBUG) console.log('🕵🏻‍♂️ selectedChainId:', selectedChainId);
+  // if (DEBUG) console.log('🕵🏻‍♂️ selectedChainId:', selectedChainId);
 
   // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
@@ -98,19 +98,19 @@ function App(props) {
 
   // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
   const yourLocalBalance = useBalance(localProvider, address);
-  if (DEBUG) console.log('💵 yourLocalBalance', yourLocalBalance ? formatEther(yourLocalBalance) : '...');
+  // if (DEBUG) console.log('💵 yourLocalBalance', yourLocalBalance ? formatEther(yourLocalBalance) : '...');
 
   // Just plug in different 🛰 providers to get your balance on different chains:
   const yourMainnetBalance = useBalance(mainnetProvider, address);
-  if (DEBUG) console.log('💵 yourMainnetBalance', yourMainnetBalance ? formatEther(yourMainnetBalance) : '...');
+  // if (DEBUG) console.log('💵 yourMainnetBalance', yourMainnetBalance ? formatEther(yourMainnetBalance) : '...');
 
   // Load in your local 📝 contract and read a value from it:
   const readContracts = useContractLoader(localProvider);
-  if (DEBUG) console.log('📝 readContracts', readContracts);
+  // if (DEBUG) console.log('📝 readContracts', readContracts);
 
   // If you want to make 🔐 write transactions to your contracts, use the userProvider:
   const writeContracts = useContractLoader(userProvider);
-  if (DEBUG) console.log('🔐 writeContracts', writeContracts);
+  // if (DEBUG) console.log('🔐 writeContracts', writeContracts);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -125,14 +125,26 @@ function App(props) {
 
   // keep track of a variable from the contract in the local React state:
   const purpose = useContractReader(readContracts, 'YourContract', 'purpose');
-  console.log('🤗 purpose:', purpose);
+  // console.log('🤗 purpose:', purpose);
 
   // 📟 Listen for broadcast events
   const setPurposeEvents = useEventListener(readContracts, 'YourContract', 'SetPurpose', localProvider, 1);
-  console.log('📟 SetPurpose events:', setPurposeEvents);
+  // console.log('📟 SetPurpose events:', setPurposeEvents);
 
   const Condition = useEventListener(readContracts, 'ConditionalTokens', 'ConditionPreparation', localProvider, 1);
-  console.log('New Condition Created :) :', Condition[0]?.conditionId);
+  if (Condition.length) console.log('New Condition Created :) :', Condition[0]?.conditionId);
+
+  const Balance = useEventListener(readContracts, 'CTVendor', 'LogCollateralBalance', localProvider, 1);
+  if (Balance.length) {
+    console.log('CTVendor LogCollateralBalance from:', Balance[0]?.from);
+    console.log('CTVendor LogCollateralBalance balance:', formatUnits(Balance[0]?.balance));
+  }
+
+  const Amount = useEventListener(readContracts, 'CTVendor', 'LogAmount', localProvider, 1);
+  if (Amount.length) {
+    console.log('CTVendor LogAmount:', formatUnits(Amount[0]?.amount));
+  }
+
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
   console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)

@@ -38,23 +38,34 @@ const main = async () => {
   console.log("\n\n 📡 Deploying...\n");
 
   const yourContract = await deploy("YourContract"); // <-- add in constructor args like line 19 vvvv
+
   const ConditionalTokens = await deploy("ConditionalTokens");
   const CTHelpers = await deploy("CTHelpers");
+
   // const IConditionalTokens = await deploy("IConditionalTokens")
-  const BankBucks = await deploy("BankBucks");
+
+  const BankBucks = await deploy("BankBucks", [
+    "0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8",
+  ]);
+
   // create a vendor for the ERC20s for testing, Watchout, its been built as "Vendor in the artifacts file"
-  const BankBucksVendor = await deploy("BankBucksVendor", [BankBucks.address]);
-  // transfer BankBucks to Vendor
-  await BankBucks.transfer(BankBucksVendor.address, utils.parseEther("1000"));
+  // const BankBucksVendor = await deploy("BankBucksVendor", [BankBucks.address]);
 
-  console.log("BankBucks address", BankBucks.address);
-  console.log("ConditionalTokens address", ConditionalTokens.address);
+  // await BankBucks.transfer(
+  //   BankBucks.address,
+  //   utils.parseEther("1000")
+  // );
 
-  console.log();
+  // console.log("BankBucks address", BankBucks.address);
+  // console.log("BankBucksVendor.address", BankBucksVendor.address);
+  // console.log("ConditionalTokens address", ConditionalTokens.address);
+
   const CTVendor = await deploy("CTVendor", [
     BankBucks.address,
     ConditionalTokens.address,
   ]);
+
+  await BankBucks.transfer(CTVendor.address, utils.parseEther("1000"));
 
   // const secondContract = await deploy("SecondContract")
 
