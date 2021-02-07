@@ -132,18 +132,13 @@ function App(props) {
   // console.log('📟 SetPurpose events:', setPurposeEvents);
 
   const Condition = useEventListener(readContracts, 'ConditionalTokens', 'ConditionPreparation', localProvider, 1);
-  if (Condition.length) console.log('New Condition Created :) :', Condition[0]?.conditionId);
+  if (Condition.length) console.log('Condition preparation events', Condition);
 
   const Balance = useEventListener(readContracts, 'CTVendor', 'LogCollateralBalance', localProvider, 1);
-  if (Balance.length) {
-    console.log('CTVendor LogCollateralBalance from:', Balance[0]?.from);
-    console.log('CTVendor LogCollateralBalance balance:', formatUnits(Balance[0]?.balance));
-  }
+  if (Balance.length) console.log('LogCollateralBalance events', Balance);
 
   const Amount = useEventListener(readContracts, 'CTVendor', 'LogAmount', localProvider, 1);
-  if (Amount.length) {
-    console.log('CTVendor LogAmount:', formatUnits(Amount[0]?.amount));
-  }
+  if (Amount.length) console.log('Amount events', Amount);
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");

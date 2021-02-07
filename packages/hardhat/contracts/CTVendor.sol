@@ -56,18 +56,10 @@ contract CTVendor {
         uint amount
         ) external {
 
-        emit LogAmount(amount);
-
         collateral.approve(address(conditionalTokens), amount);
-        collateral.approve(address(this), amount);
 
+        emit LogAmount(amount);
         emit LogCollateralBalance(address(this), collateral.balanceOf(msg.sender));
-        emit LogCollateralBalance(msg.sender, collateral.balanceOf(msg.sender));
-
-        // collateral.transferFrom(msg.sender, address(this), amount);
-
-        // emit LogCollateralBalance(address(this), collateral.balanceOf(msg.sender));
-        // emit LogCollateralBalance(msg.sender, collateral.balanceOf(msg.sender));
 
         uint[] memory partition = new uint[](2); 
         partition[0] = 1;
@@ -81,8 +73,8 @@ contract CTVendor {
             amount
         );
 
-        // tokenBalance[questionId][0] = amount;
-        // tokenBalance[questionId][1] = amount;
+        tokenBalance[questionId][0] = amount;
+        tokenBalance[questionId][1] = amount;
     }
 
     // to do: add admin and control for onlyAdmin
