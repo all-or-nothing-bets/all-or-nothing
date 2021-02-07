@@ -4,7 +4,6 @@ import usePoller from "./Poller";
 const DEBUG = false;
 
 export default function useContractReader(contracts, contractName, functionName, args, pollTime, formatter, onChange) {
-  if (contractName !== 'YourContract') console.log(`Reading contract ${contractName} function ${functionName}`);
   let adjustPollTime = 1777;
   if (pollTime) {
     adjustPollTime = pollTime;

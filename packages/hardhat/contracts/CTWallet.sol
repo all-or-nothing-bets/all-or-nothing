@@ -25,7 +25,6 @@ contract CTWallet {
     }
 
     function redeemTokens(
-        bytes32 conditionId,
         uint[] calldata indexSets
     ) external {
         conditionalTokens.redeemPositions(
@@ -48,7 +47,7 @@ contract CTWallet {
         uint256 value,
         bytes calldata data
         )
-        external
+        external pure
         returns(bytes4) {
             return bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"));
     }
@@ -60,7 +59,7 @@ contract CTWallet {
         uint256[] calldata values,
         bytes calldata data
         )
-        external
+        external pure
         returns(bytes4) {
             return bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"));
     }

@@ -42,9 +42,7 @@ const main = async () => {
 
   // const IConditionalTokens = await deploy("IConditionalTokens")
 
-  const BankBucks = await deploy("BankBucks", [
-    "0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8",
-  ]);
+  const BankBucks = await deploy("BankBucks");
 
   // create a vendor for the ERC20s for testing, Watchout, its been built as "Vendor in the artifacts file"
   // const BankBucksVendor = await deploy("BankBucksVendor", [BankBucks.address]);

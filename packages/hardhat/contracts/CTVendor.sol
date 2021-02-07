@@ -117,7 +117,7 @@ contract CTVendor {
         uint256 value,
         bytes calldata data
         )
-        external
+        external pure
         returns(bytes4) {
             return this.onERC1155Received.selector;
         }
@@ -130,7 +130,7 @@ contract CTVendor {
         uint256[] calldata values,
         bytes calldata data
         )
-        external
+        external pure
         returns(bytes4) {
             return this.onERC1155BatchReceived.selector;
         }
