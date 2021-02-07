@@ -114,9 +114,9 @@ contract CTVendor {
         )
         external
         returns(bytes4) {
-            return bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"));
-    }
-
+            return this.onERC1155Received.selector;
+        }
+        // return bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"));
 
     function onERC1155BatchReceived(
         address operator,
@@ -127,8 +127,9 @@ contract CTVendor {
         )
         external
         returns(bytes4) {
-            return bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"));
-    }
+            return this.onERC1155BatchReceived.selector;
+        }
+        // return bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"));
 
     fallback() external payable {
     }
