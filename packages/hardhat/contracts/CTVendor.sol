@@ -13,7 +13,7 @@ contract CTVendor {
     address oracle;
     bytes32 questionId;
     uint numOutcomes;
-    bytes32 conditionId;
+    bytes32 public conditionId;
 
     mapping(bytes32 => mapping(uint => uint)) public tokenBalance;
 
@@ -26,6 +26,11 @@ contract CTVendor {
         ) public {
         collateral = IERC20(_collateral);
         conditionalTokens = IConditionalTokens(_conditionalTokens);
+    }
+
+    // to do: add modifier to control who can view
+    function getConditionId() external view returns (bytes32) {
+        return conditionId;
     }
 
     function createCondition(
