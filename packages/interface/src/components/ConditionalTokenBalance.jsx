@@ -26,7 +26,7 @@ export default function ConditionalTokenBalance(props) {
   useEffect(() => {
     if (!conditionId) return;
     const getCollectionId = async () => {
-      const response = await conditional.getCollectionId(formatBytes32String(0), conditionId, 2);
+      const response = await conditional.getCollectionId(formatBytes32String(0), conditionId, 1);
       if (response !== '0x0000000000000000000000000000000000000000') setCollectionId(response);
     };
     getCollectionId();

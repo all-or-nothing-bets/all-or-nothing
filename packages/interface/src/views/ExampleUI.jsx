@@ -5,7 +5,6 @@ import { Button, List, Divider, Input, Card, DatePicker, Slider, Switch, Progres
 import { SyncOutlined } from "@ant-design/icons";
 import { Address, Balance } from "../components";
 import { parseEther, formatEther } from "@ethersproject/units";
-import { useContractReader } from "eth-hooks";
 
 export default function ExampleUI({
   purpose,
@@ -21,7 +20,6 @@ export default function ExampleUI({
   writeContracts,
 }) {
   const [newPurpose, setNewPurpose] = useState("loading...");
-  // const conditionId = useContractReader(readContracts, "CTVendor", "conditionId");
 
   return (
     <div>
@@ -30,7 +28,6 @@ export default function ExampleUI({
       */}
       <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
         <h2>Example UI:</h2>
-        {JSON.stringify(readContracts?.CTVendor, null, 2)}
         <h4>purpose: {purpose}</h4>
         <Divider />
         <div style={{ margin: 8 }}>

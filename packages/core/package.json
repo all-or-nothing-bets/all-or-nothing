@@ -1,8 +1,8 @@
 {
-  "name": "@scaffold-eth/hardhat",
-  "version": "1.0.0",
+  "name": "@all-or-nothing/core",
+  "version": "0.1.0",
   "main": "index.js",
-  "license": "MIT",
+  "private": true,
   "devDependencies": {
     "eslint": "^7.5.0",
     "eslint-config-airbnb": "^18.2.0",
