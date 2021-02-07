@@ -1,14 +1,23 @@
 import React, { useState } from 'react';
+import { formatBytes32String } from '@ethersproject/strings';
 import { Button, DatePicker, Form, Input, Radio, Select, Space, Typography } from 'antd';
 import './createBet.css';
 
-export default function CreateBet() {
+export default function CreateBet({ tx, writeContracts }) {
   const [data, setData] = useState();
-
   const { Title, Text } = Typography;
   const { Option } = Select;
 
-  const onFinish = formData => setData(formData);
+  const onFinish = formData => {
+    const args = [
+      '0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8', // oracle
+      formatBytes32String(formData.question), // questionId
+      2, // number of outcomes
+    ];
+    tx(writeContracts.CTVendor.createCondition(...args));
+    setData(formData);
+  };
+
   return (
     <div>
       <div style={{ border: '1px solid #cccccc', padding: 16, width: 400, margin: 'auto', marginTop: 64 }}>
