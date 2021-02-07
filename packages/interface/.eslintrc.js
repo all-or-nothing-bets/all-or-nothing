@@ -3,9 +3,25 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  extends: ['airbnb', 'plugin:prettier/recommended', 'prettier/react'],
-  plugins: ['babel', 'prettier'],
+  extends: [
+    'react-app',
+    'airbnb',
+    'plugin:jsx-a11y/recommended',
+    'prettier',
+    'prettier/react',
+    'eslint:recommended',
+    'plugin:react/recommended',
+  ],
+  plugins: ['react', 'jsx-a11y', 'babel', 'prettier'],
   parser: 'babel-eslint',
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+      modules: true,
+    },
+    ecmaVersion: 2018,
+    sourceType: 'module',
+  },
   rules: {
     'prettier/prettier': ['error'],
     'import/extensions': [
@@ -19,7 +35,7 @@ module.exports = {
       },
     ],
     'import/prefer-default-export': 'off',
-    'prefer-destructuring': 'off',
+    'prefer-destructuring': 'on',
     'prefer-template': 'off',
     'react/prop-types': 'off',
     'react/destructuring-assignment': 'off',

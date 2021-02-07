@@ -7,7 +7,7 @@ import './App.css';
 import { Row, Col, Button, Menu, Alert } from 'antd';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import { formatEther, parseEther, formatUnits } from '@ethersproject/units';
+import { formatEther, parseEther } from '@ethersproject/units';
 import { useUserAddress } from 'eth-hooks';
 import {
   useExchangePrice,
@@ -19,19 +19,19 @@ import {
   useBalance,
   // useExternalContractLoader,
 } from './hooks';
-import { Header, Account, Faucet, Ramp, Contract, GasGauge, TokenBalance } from './components';
+import { Header, Account, Faucet, Ramp, Contract, GasGauge } from './components';
 import { Transactor } from './helpers';
 
 // import Hints from "./Hints";
 
-import { Hints, ExampleUI, Subgraph, AllOrNothing } from './views';
+import { Hints, ExampleUI, Subgraph, AllOrNothing, CreateBet } from './views';
 // eslint-disable-next-line no-unused-vars
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
 
 const targetNetwork = NETWORKS.localhost; // localhost, rinkeby, xdai, mainnet
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 
 // 🛰 providers
 if (DEBUG) console.log('📡 Connecting to Mainnet Ethereum');
@@ -103,20 +103,20 @@ function App(props) {
 
   // keep track of a variable from the contract in the local React state:
   const purpose = useContractReader(readContracts, 'YourContract', 'purpose');
-  console.log('🤗 purpose:', purpose);
+  // if (DEBUG) console.log('🤗 purpose:', purpose);
 
   // 📟 Listen for broadcast events
   const setPurposeEvents = useEventListener(readContracts, 'YourContract', 'SetPurpose', localProvider, 1);
-  console.log('📟 SetPurpose events:', setPurposeEvents);
+  // if (DEBUG) console.log('📟 SetPurpose events:', setPurposeEvents);
 
   const Condition = useEventListener(readContracts, 'ConditionalTokens', 'ConditionPreparation', localProvider, 1);
   if (Condition.length) console.log('Condition preparation events', Condition);
 
-  const Balance = useEventListener(readContracts, 'CTVendor', 'LogCollateralBalance', localProvider, 1);
-  if (Balance.length) console.log('LogCollateralBalance events', Balance);
+  // const Balance = useEventListener(readContracts, 'CTVendor', 'LogCollateralBalance', localProvider, 1);
+  // if (Balance.length) console.log('LogCollateralBalance events', Balance);
 
-  const Amount = useEventListener(readContracts, 'CTVendor', 'LogAmount', localProvider, 1);
-  if (Amount.length) console.log('Amount events', Amount);
+  // const Amount = useEventListener(readContracts, 'CTVendor', 'LogAmount', localProvider, 1);
+  // if (Amount.length) console.log('Amount events', Amount);
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -230,6 +230,16 @@ Web3 modal helps us "connect" external wallets:
               YourContract
             </Link>
           </Menu.Item>
+          <Menu.Item key='/create-bet'>
+            <Link
+              onClick={() => {
+                setRoute('/create-bet');
+              }}
+              to='/create-bet'
+            >
+              Create Bet
+            </Link>
+          </Menu.Item>
           <Menu.Item key='/all-or-nothing'>
             <Link
               onClick={() => {
@@ -289,19 +299,26 @@ Web3 modal helps us "connect" external wallets:
             />
             */}
           </Route>
+          <Route path='/create-bet'>
+            <CreateBet
+              address={address}
+              userProvider={userProvider}
+              mainnetProvider={mainnetProvider}
+              localProvider={localProvider}
+              tx={tx}
+              writeContracts={writeContracts}
+              readContracts={readContracts}
+            />
+          </Route>
           <Route path='/all-or-nothing'>
             <AllOrNothing
               address={address}
               userProvider={userProvider}
               mainnetProvider={mainnetProvider}
               localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              price={price}
               tx={tx}
               writeContracts={writeContracts}
               readContracts={readContracts}
-              purpose={purpose}
-              setPurposeEvents={setPurposeEvents}
             />
           </Route>
           <Route path='/hints'>
