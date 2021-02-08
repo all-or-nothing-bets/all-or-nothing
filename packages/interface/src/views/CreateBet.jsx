@@ -1,36 +1,62 @@
 import React, { useState } from 'react';
 import { formatBytes32String } from '@ethersproject/strings';
+import { parseUnits } from '@ethersproject/units';
 import { Button, DatePicker, Form, Input, Radio, Select, Space, Typography } from 'antd';
 import './createBet.css';
 
 export default function CreateBet({ tx, writeContracts }) {
-  const [data, setData] = useState();
+  const [approved, setApproved] = useState(false);
+  const [error, setError] = useState();
   const { Title, Text } = Typography;
   const { Option } = Select;
+  const { BankBucks, CTVendor } = writeContracts || '';
+  const [form] = Form.useForm();
 
-  const onFinish = formData => {
-    const args = [
-      '0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8', // oracle
-      formatBytes32String(formData.question), // questionId
-      2, // number of outcomes
-    ];
-    tx(writeContracts.CTVendor.createCondition(...args));
-    setData(formData);
+  const handleApprove = async () => {
+    try {
+      const data = await form.validateFields();
+      console.log('data', data);
+      // need to import relevant collateral contracts and use them, not BankBucks
+      tx(BankBucks.approve(CTVendor.address, parseUnits(data.amount)));
+      // need to wait for transaction approval
+      setApproved(true);
+      setError(null);
+    } catch (error) {
+      console.log('Error approving', error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const data = await form.validateFields();
+      if (!approved) setError('approving wager is required');
+      else {
+        console.log('creating condition, data:', data);
+        const args = [
+          '0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8', // oracle
+          formatBytes32String(data.question), // questionId
+          2, // number of outcomes
+        ];
+        tx(CTVendor.createCondition(...args));
+      }
+    } catch (error) {
+      console.log('Error submitting', error);
+    }
   };
 
   return (
     <div>
-      <div style={{ border: '1px solid #cccccc', padding: 16, width: 400, margin: 'auto', marginTop: 64 }}>
+      <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 64 }}>
         <Title>Set market question</Title>
-        <Form onFinish={onFinish}>
+        <Form form={form}>
           <div style={{ margin: 8 }}>
-            <Form.Item name='question' extra={`For example, "Will it rain on Sunday?"`}>
+            <Form.Item name='question' extra={`For example, "Will it rain on Sunday?"`} rules={[{ required: true }]}>
               <Input size='large' placeholder='Will…?' />
             </Form.Item>
           </div>
           <div style={{ margin: 8 }}>
             <Title level={2}>Place your bet:</Title>
-            <Form.Item name='answer'>
+            <Form.Item name='answer' rules={[{ required: true }]}>
               <Radio.Group size='large'>
                 <Space direction='horizontal'>
                   <Radio.Button value='yes'>
@@ -44,7 +70,7 @@ export default function CreateBet({ tx, writeContracts }) {
             </Form.Item>
           </div>
           <div style={{ margin: 8 }}>
-            <Form.Item label='We should know by:' name='dateTime'>
+            <Form.Item label='We should know by:' name='dateTime' rules={[{ required: true }]}>
               <DatePicker showTime />
             </Form.Item>
             <Text type='secondary'>
@@ -54,7 +80,7 @@ export default function CreateBet({ tx, writeContracts }) {
           <div style={{ margin: 16 }}>
             <Title level={3}>How much will you wager?</Title>
             <Space style={{ margin: 8 }} direction='horizontal'>
-              <Form.Item name='collateral'>
+              <Form.Item name='collateral' rules={[{ required: true }]}>
                 <Select
                   showSearch
                   style={{ width: 100 }}
@@ -67,19 +93,24 @@ export default function CreateBet({ tx, writeContracts }) {
                   <Option value='USDT'>USDT</Option>
                 </Select>
               </Form.Item>
-              <Form.Item name='amount'>
+              <Form.Item name='amount' rules={[{ required: true }]}>
                 <Input placeholder='0' type='number' />
               </Form.Item>
             </Space>
+            <Button type='default' htmlType='button' onClick={handleApprove}>
+              Approve
+            </Button>
           </div>
           <Form.Item>
-            <Button size='large' type='primary' htmlType='submit'>
+            <Button size='large' type='primary' htmlType='button' onClick={handleSubmit}>
               Make bet
             </Button>
           </Form.Item>
+          <div className='ant-form-item-explain ant-form-item-explain-error'>
+            <div role='alert'>{error}</div>
+          </div>
         </Form>
       </div>
-      <pre>data: {JSON.stringify(data, null, 2)}</pre>
     </div>
   );
 }
