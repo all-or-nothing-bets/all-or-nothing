@@ -45,12 +45,12 @@ const main = async () => {
   const BankBucks = await deploy("BankBucks");
 
   // create a vendor for the ERC20s for testing, Watchout, its been built as "Vendor in the artifacts file"
-  // const BankBucksVendor = await deploy("BankBucksVendor", [BankBucks.address]);
+   const BankBucksVendor = await deploy("BankBucksVendor", [BankBucks.address]);
 
-  // await BankBucks.transfer(
-  //   BankBucks.address,
-  //   utils.parseEther("1000")
-  // );
+   await BankBucks.transfer(
+     BankBucksVendor.address,
+     utils.parseEther("500")
+   );
 
   // console.log("BankBucks address", BankBucks.address);
   // console.log("BankBucksVendor.address", BankBucksVendor.address);
@@ -61,7 +61,7 @@ const main = async () => {
     ConditionalTokens.address,
   ]);
 
-  await BankBucks.transfer(CTVendor.address, utils.parseEther("1000"));
+  await BankBucks.transfer(CTVendor.address, utils.parseEther("500"));
 
   // const secondContract = await deploy("SecondContract")
 
