@@ -288,6 +288,14 @@ Web3 modal helps us "connect" external wallets:
               blockExplorer={blockExplorer}
             />
 
+<Contract
+              name='BankBucksVendor'
+              signer={userProvider.getSigner()}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+            />
+
             {/* Uncomment to display and interact with an external contract (DAI on mainnet):
             <Contract
               name="DAI"
