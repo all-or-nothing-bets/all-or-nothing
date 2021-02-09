@@ -20,6 +20,8 @@
     "node": "yarn workspace @all-or-nothing/core chain",
     "test": "yarn workspace @all-or-nothing/core test",
     "start": "yarn workspace @all-or-nothing/interface start",
+    "start-server": "yarn workspace @all-or-nothing/server start-server",
+    "start-server-dev": "yarn workspace @all-or-nothing/interface start-server-dev",
     "compile": "yarn workspace @all-or-nothing/core compile",
     "deploy": "yarn workspace @all-or-nothing/core deploy",
     "watch": "yarn workspace @all-or-nothing/core watch",
