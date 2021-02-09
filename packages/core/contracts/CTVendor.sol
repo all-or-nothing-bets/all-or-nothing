@@ -4,11 +4,7 @@ import 'hardhat/console.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {IERC1155} from '@openzeppelin/contracts/token/ERC1155/IERC1155.sol';
 // import { IERC1155Receiver } from "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
-<<<<<<< HEAD:packages/core/contracts/CTVendor.sol
 import './IConditionalTokens.sol';
-=======
-import "../IConditionalTokens.sol";
->>>>>>> main:packages/core/contracts/test/CTVendor.sol
 
 contract CTVendor {
     IERC20 collateral;
@@ -184,18 +180,9 @@ contract CTVendor {
         //send back to bettor
         transferTokens(_indexSet, bettor, _amount);
         //update token balances
-<<<<<<< HEAD:packages/core/contracts/CTVendor.sol
         tokenBalance[questionId][_indexSet] =
             tokenBalance[questionId][_indexSet] -
             _amount;
-=======
-        tokenBalance[questionId][_indexSet] = tokenBalance[questionId][_indexSet] - _amount;
-    }
-    
-    
-    
-    fallback() external payable {
->>>>>>> main:packages/core/contracts/test/CTVendor.sol
     }
 
     fallback() external payable {}
