@@ -31,7 +31,7 @@ import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants'
 const targetNetwork = NETWORKS.localhost; // localhost, rinkeby, xdai, mainnet
 
 // 😬 Sorry for all the console logging
-const DEBUG = false;
+const DEBUG = true;
 
 // 🛰 providers
 if (DEBUG) console.log('📡 Connecting to Mainnet Ethereum');
@@ -288,7 +288,7 @@ Web3 modal helps us "connect" external wallets:
               blockExplorer={blockExplorer}
             />
 
-<Contract
+            <Contract
               name='BankBucksVendor'
               signer={userProvider.getSigner()}
               provider={localProvider}
