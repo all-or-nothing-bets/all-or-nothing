@@ -25,7 +25,7 @@ import { Transactor } from './helpers';
 
 // import Hints from "./Hints";
 
-import { Subgraph, AllOrNothing, CreateBet, Bets, BetConfirmed } from './views';
+import { CreateBet, Bet, BetConfirmed, TokenBalances } from './views';
 // eslint-disable-next-line no-unused-vars
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
 
@@ -231,12 +231,12 @@ Web3 modal helps us "connect" external wallets:
               Contract Reader
             </Link>
           </Menu.Item>
-          <Menu.Item key='/all-or-nothing'>
+          <Menu.Item key='/token-balances'>
             <Link
               onClick={() => {
-                setRoute('/all-or-nothing');
+                setRoute('/token-balances');
               }}
-              to='/all-or-nothing'
+              to='/token-balances'
             >
               Token Balances
             </Link>
@@ -271,14 +271,6 @@ Web3 modal helps us "connect" external wallets:
               blockExplorer={blockExplorer}
             />
 
-            <Contract
-              name='BankBucksVendor'
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-
             {/* Uncomment to display and interact with an external contract (DAI on mainnet):
             <Contract
               name="DAI"
@@ -290,41 +282,26 @@ Web3 modal helps us "connect" external wallets:
             />
             */}
           </Route>
-          <Route path='/all-or-nothing'>
-            <AllOrNothing
+          <Route path='/token-balances'>
+            <TokenBalances
               address={address}
               userProvider={userProvider}
               mainnetProvider={mainnetProvider}
               localProvider={localProvider}
+              f
               tx={tx}
               writeContracts={writeContracts}
               readContracts={readContracts}
             />
           </Route>
           <Route path='/create-bet'>
-            <CreateBet
-              address={address}
-              userProvider={userProvider}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-            />
+            <CreateBet tx={tx} writeContracts={writeContracts} />
           </Route>
           <Route path='/bets/:questionId/confirmed'>
-            <BetConfirmed
-              address={address}
-              userProvider={userProvider}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-            />
+            <BetConfirmed />
           </Route>
           <Route path='/bets/:questionId'>
-            <Bets
+            <Bet
               address={address}
               userProvider={userProvider}
               mainnetProvider={mainnetProvider}

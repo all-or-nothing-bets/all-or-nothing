@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { formatBytes32String } from '@ethersproject/strings';
 import { parseUnits } from '@ethersproject/units';
-import { Button, DatePicker, Form, Input, Radio, Select, Space, Typography } from 'antd';
+import { Button, DatePicker, Form, Input, Radio, Space, Typography } from 'antd';
+import { Collateral } from '../components';
 import './createBet.css';
 
 export default function CreateBet({ tx, writeContracts }) {
@@ -10,7 +11,6 @@ export default function CreateBet({ tx, writeContracts }) {
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
   const { Title, Text } = Typography;
-  const { Option } = Select;
   const { BankBucks, CTVendor } = writeContracts || '';
   const [form] = Form.useForm();
 
@@ -43,7 +43,7 @@ export default function CreateBet({ tx, writeContracts }) {
           indexSet,
         ];
         tx(CTVendor.setupConditionAndCollateral(...args));
-        history.push(`/bets/${questionId}`);
+        history.push(`/bets/${questionId}/confirmed`);
       }
     } catch (error) {
       console.log('Error creating bet', error);
@@ -58,7 +58,7 @@ export default function CreateBet({ tx, writeContracts }) {
       <Form form={form}>
         <div style={{ margin: 8 }}>
           <Form.Item name='question' extra={`For example, "Will it rain on Sunday?"`} rules={[{ required: true }]}>
-            <Input size='large' placeholder='Will…?' />
+            <Input size='large' placeholder='Will…?' autoComplete='off' />
           </Form.Item>
         </div>
         <div style={{ margin: 8 }}>
@@ -86,25 +86,7 @@ export default function CreateBet({ tx, writeContracts }) {
         </div>
         <div style={{ margin: 16 }}>
           <Title level={3}>How much will you wager?</Title>
-          <Space style={{ margin: 8 }} direction='horizontal'>
-            <Form.Item name='collateral' rules={[{ required: true }]}>
-              <Select
-                showSearch
-                style={{ width: 100 }}
-                placeholder='token'
-                optionFilterProp='children'
-                filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-              >
-                <Option value='BNK'>BankBucks</Option>
-                <Option value='DAI'>DAI</Option>
-                <Option value='USDC'>USDC</Option>
-                <Option value='USDT'>USDT</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name='amount' rules={[{ required: true }]}>
-              <Input placeholder='0' type='number' />
-            </Form.Item>
-          </Space>
+          <Collateral />
           <Button type='default' htmlType='button' onClick={handleApprove}>
             Approve
           </Button>

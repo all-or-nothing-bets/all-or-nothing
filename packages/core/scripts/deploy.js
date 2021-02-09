@@ -39,16 +39,10 @@ const main = async () => {
   const CTHelpers = await deploy("CTHelpers");
   const BankBucks = await deploy("BankBucks");
 
-  // create a vendor for the ERC20s for testing, Watchout, its been built as "Vendor in the artifacts file"
-  const BankBucksVendor = await deploy("BankBucksVendor", [BankBucks.address]);
-  await BankBucks.transfer(BankBucksVendor.address, utils.parseEther("500"));
-
   const CTVendor = await deploy("CTVendor", [
     BankBucks.address,
     ConditionalTokens.address,
   ]);
-
-  // await BankBucks.transfer(CTVendor.address, utils.parseEther("500"));
 
   await BankBucks.transfer(
     "0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8", // your wallet address here

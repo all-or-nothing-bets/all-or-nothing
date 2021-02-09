@@ -6,12 +6,11 @@ import { TwitterShareButton } from 'react-twitter-embed';
 import { Button, Card, Space, Typography } from 'antd';
 import './createBet.css';
 
-export default function CreateBet() {
-  console.log('window.location', window.location);
+export default function BetConfirmed() {
   const { questionId } = useParams();
   const question = isHexString(questionId) ? parseBytes32String(questionId) : 'Not Found';
   const { Title, Text } = Typography;
-  const withdrawBet = () => console.log('withdrawBet');
+  const withdrawBet = () => console.log('withdrawBet'); // to do: to implement withdraw
   const { origin } = window.location;
   const path = `/bets/${questionId}`;
   const tweet = `Put your money where your mouth is 🤑 @ I'm challenging you to a bet on "${question}"`;
