@@ -41,21 +41,27 @@ describe("Bet creation flow", function () {
       // is is shortened down so it fits into 32bytes
       link = 'elonmusk/1357236825589432322';
       outcomes = ['doge', 'no doge'];
-      amount = '100';
+      amount = '200';
     });
 
     describe(" ", function () {
-      it("Should create a condition", async function () {
+      it("Should create a bet", async function () {
 
         // generate question id from the twitter link
-        questionId = ethers.utils.formatBytes32String(link)
+        questionId = ethers.utils.formatBytes32String(link);
 
         // approve tokens to be transfered to amm
         await bankBucks.approve(amm.address, amount);
         // create bet
         await amm.createBet(oracle.address, questionId, outcomes.length, amount);
 
-        // expect(true).to.equal(true);
+        // get ERC1155 ids
+        let events = await conditionalTokens.queryFilter('TransferBatch');
+        let ids = events[0].args.ids;
+
+        // check the amount of ERC1155 tokens minted
+        expect(await conditionalTokens.balanceOf(amm.address, ids[0])).to.equal(amount);
+        expect(await conditionalTokens.balanceOf(amm.address, ids[1])).to.equal(amount);
       });
     });
   });
