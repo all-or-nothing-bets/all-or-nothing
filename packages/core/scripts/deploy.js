@@ -48,7 +48,12 @@ const main = async () => {
     ConditionalTokens.address,
   ]);
 
-  await BankBucks.transfer(CTVendor.address, utils.parseEther("500"));
+  // await BankBucks.transfer(CTVendor.address, utils.parseEther("500"));
+
+  await BankBucks.transfer(
+    "0x3bA84f8075f2f424ED04d188dC34d8E09607E572", // your wallet address here
+    utils.parseEther("500")
+  );
 
   /*
   //If you want to send value to an address from the deployer
