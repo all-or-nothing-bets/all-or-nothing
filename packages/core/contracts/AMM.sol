@@ -47,6 +47,18 @@ contract AMM {
         conditionalTokens.safeTransferFrom(address(this), msg.sender, betId, amount, "");
     }
 
+    function redeemTokens(
+        bytes32 conditionId,
+        uint[] calldata indexSets
+    ) external {
+        conditionalTokens.redeemPositions(
+            collateral,
+            bytes32(0),  // parentCollectionId, here 0 since top-level bet
+            conditionId,
+            indexSets
+        );
+    }
+
     function onERC1155Received(
         address operator,
         address from,
