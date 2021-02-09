@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+/* eslint-disable jsx-a11y/accessible-emoji */
 import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
 import 'antd/dist/antd.css';
@@ -24,14 +25,14 @@ import { Transactor } from './helpers';
 
 // import Hints from "./Hints";
 
-import { Hints, ExampleUI, Subgraph, AllOrNothing, CreateBet } from './views';
+import { CreateBet, Bet, BetConfirmed, TokenBalances } from './views';
 // eslint-disable-next-line no-unused-vars
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
 
 const targetNetwork = NETWORKS.localhost; // localhost, rinkeby, xdai, mainnet
 
 // 😬 Sorry for all the console logging
-const DEBUG = false;
+const DEBUG = true;
 
 // 🛰 providers
 if (DEBUG) console.log('📡 Connecting to Mainnet Ethereum');
@@ -227,7 +228,17 @@ Web3 modal helps us "connect" external wallets:
               }}
               to='/'
             >
-              YourContract
+              Contract Reader
+            </Link>
+          </Menu.Item>
+          <Menu.Item key='/token-balances'>
+            <Link
+              onClick={() => {
+                setRoute('/token-balances');
+              }}
+              to='/token-balances'
+            >
+              Token Balances
             </Link>
           </Menu.Item>
           <Menu.Item key='/create-bet'>
@@ -240,38 +251,10 @@ Web3 modal helps us "connect" external wallets:
               Create Bet
             </Link>
           </Menu.Item>
-          <Menu.Item key='/all-or-nothing'>
-            <Link
-              onClick={() => {
-                setRoute('/all-or-nothing');
-              }}
-              to='/all-or-nothing'
-            >
-              All or Nothing
-            </Link>
-          </Menu.Item>
-          <Menu.Item key='/hints'>
-            <Link
-              onClick={() => {
-                setRoute('/hints');
-              }}
-              to='/hints'
-            >
-              Hints
-            </Link>
-          </Menu.Item>
         </Menu>
 
         <Switch>
           <Route exact path='/'>
-            <Contract
-              name='YourContract'
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-
             <Contract
               name='CTVendor'
               signer={userProvider.getSigner()}
@@ -282,14 +265,6 @@ Web3 modal helps us "connect" external wallets:
 
             <Contract
               name='BankBucks'
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-
-<Contract
-              name='BankBucksVendor'
               signer={userProvider.getSigner()}
               provider={localProvider}
               address={address}
@@ -307,8 +282,26 @@ Web3 modal helps us "connect" external wallets:
             />
             */}
           </Route>
+          <Route path='/token-balances'>
+            <TokenBalances
+              address={address}
+              userProvider={userProvider}
+              mainnetProvider={mainnetProvider}
+              localProvider={localProvider}
+              f
+              tx={tx}
+              writeContracts={writeContracts}
+              readContracts={readContracts}
+            />
+          </Route>
           <Route path='/create-bet'>
-            <CreateBet
+            <CreateBet tx={tx} writeContracts={writeContracts} />
+          </Route>
+          <Route path='/bets/:questionId/confirmed'>
+            <BetConfirmed />
+          </Route>
+          <Route path='/bets/:questionId'>
+            <Bet
               address={address}
               userProvider={userProvider}
               mainnetProvider={mainnetProvider}
@@ -316,48 +309,6 @@ Web3 modal helps us "connect" external wallets:
               tx={tx}
               writeContracts={writeContracts}
               readContracts={readContracts}
-            />
-          </Route>
-          <Route path='/all-or-nothing'>
-            <AllOrNothing
-              address={address}
-              userProvider={userProvider}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-            />
-          </Route>
-          <Route path='/hints'>
-            <Hints
-              address={address}
-              yourLocalBalance={yourLocalBalance}
-              mainnetProvider={mainnetProvider}
-              price={price}
-            />
-          </Route>
-          <Route path='/exampleui'>
-            <ExampleUI
-              address={address}
-              userProvider={userProvider}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              price={price}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-              purpose={purpose}
-              setPurposeEvents={setPurposeEvents}
-            />
-          </Route>
-          <Route path='/subgraph'>
-            <Subgraph
-              subgraphUri={props.subgraphUri}
-              tx={tx}
-              writeContracts={writeContracts}
-              mainnetProvider={mainnetProvider}
             />
           </Route>
         </Switch>

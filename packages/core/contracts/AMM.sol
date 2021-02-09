@@ -1,35 +1,38 @@
 pragma solidity ^0.6.0;
 
-import "hardhat/console.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { IERC1155 } from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import 'hardhat/console.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {IERC1155} from '@openzeppelin/contracts/token/ERC1155/IERC1155.sol';
 // import { IERC1155Receiver } from "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 
-import "./test/ConditionalTokens.sol";
+import './ConditionalTokens.sol';
 
 contract AMM {
-    IERC20             collateral;
-    ConditionalTokens  conditionalTokens;
+    IERC20 collateral;
+    ConditionalTokens conditionalTokens;
 
-    constructor(
-        address _collateral,
-        address _conditionalTokens
-        ) public {
+    constructor(address _collateral, address _conditionalTokens) public {
         collateral = IERC20(_collateral);
         conditionalTokens = ConditionalTokens(_conditionalTokens);
     }
 
-    function createBet(address oracle, bytes32 questionId, uint numOutcomes, uint amount) public {
+    function createBet(
+        address oracle,
+        bytes32 questionId,
+        uint256 numOutcomes,
+        uint256 amount
+    ) public {
         conditionalTokens.prepareCondition(oracle, questionId, numOutcomes);
-        
-        bytes32 conditionId = conditionalTokens.getConditionId(oracle, questionId, numOutcomes);
-        
+
+        bytes32 conditionId =
+            conditionalTokens.getConditionId(oracle, questionId, numOutcomes);
+
         // transfer collateral to AMM address
         collateral.transferFrom(msg.sender, address(this), amount);
         // approve collateral to be spent by conditionalTokens
         collateral.approve(address(conditionalTokens), amount);
 
-        uint[] memory partition = new uint[](2);
+        uint256[] memory partition = new uint256[](2);
         partition[0] = 1;
         partition[1] = 2;
 
@@ -42,18 +45,23 @@ contract AMM {
         );
     }
 
-    function bet(uint betId, uint amount) public {
+    function bet(uint256 betId, uint256 amount) public {
         collateral.transferFrom(msg.sender, address(this), amount);
-        conditionalTokens.safeTransferFrom(address(this), msg.sender, betId, amount, "");
+        conditionalTokens.safeTransferFrom(
+            address(this),
+            msg.sender,
+            betId,
+            amount,
+            ''
+        );
     }
 
-    function redeemTokens(
-        bytes32 conditionId,
-        uint[] calldata indexSets
-    ) external {
+    function redeemTokens(bytes32 conditionId, uint256[] calldata indexSets)
+        external
+    {
         conditionalTokens.redeemPositions(
             collateral,
-            bytes32(0),  // parentCollectionId, here 0 since top-level bet
+            bytes32(0), // parentCollectionId, here 0 since top-level bet
             conditionId,
             indexSets
         );
@@ -65,11 +73,9 @@ contract AMM {
         uint256 id,
         uint256 value,
         bytes calldata data
-        )
-        external pure
-        returns(bytes4) {
-            return this.onERC1155Received.selector;
-        }
+    ) external pure returns (bytes4) {
+        return this.onERC1155Received.selector;
+    }
 
     function onERC1155BatchReceived(
         address operator,
@@ -77,13 +83,9 @@ contract AMM {
         uint256[] calldata ids,
         uint256[] calldata values,
         bytes calldata data
-        )
-        external pure
-        returns(bytes4) {
-            return this.onERC1155BatchReceived.selector;
-        }
-
-    
-    fallback() external payable {
+    ) external pure returns (bytes4) {
+        return this.onERC1155BatchReceived.selector;
     }
+
+    fallback() external payable {}
 }

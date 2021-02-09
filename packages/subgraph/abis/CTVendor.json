@@ -83,29 +83,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_oracle",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "_questionId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_numOutcomes",
-        "type": "uint256"
-      }
-    ],
-    "name": "createCondition",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "getConditionId",
     "outputs": [
@@ -194,6 +171,39 @@
       }
     ],
     "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_oracle",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_questionId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_numOutcomes",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_indexSet",
+        "type": "uint256"
+      }
+    ],
+    "name": "setupConditionAndCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

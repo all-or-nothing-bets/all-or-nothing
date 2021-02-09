@@ -35,39 +35,19 @@ const deploy = async (
 };
 
 const main = async () => {
-  // const yourContract = await deploy("YourContract"); // <-- add in constructor args like line 19 vvvv
-
   const ConditionalTokens = await deploy("ConditionalTokens");
   const CTHelpers = await deploy("CTHelpers");
-
-  // const IConditionalTokens = await deploy("IConditionalTokens")
-
   const BankBucks = await deploy("BankBucks");
-
-  // create a vendor for the ERC20s for testing, Watchout, its been built as "Vendor in the artifacts file"
-   const BankBucksVendor = await deploy("BankBucksVendor", [BankBucks.address]);
-
-   await BankBucks.transfer(
-     BankBucksVendor.address,
-     utils.parseEther("500")
-   );
-
-  // console.log("BankBucks address", BankBucks.address);
-  // console.log("BankBucksVendor.address", BankBucksVendor.address);
-  // console.log("ConditionalTokens address", ConditionalTokens.address);
 
   const CTVendor = await deploy("CTVendor", [
     BankBucks.address,
     ConditionalTokens.address,
   ]);
 
-  await BankBucks.transfer(CTVendor.address, utils.parseEther("500"));
-
-  // const secondContract = await deploy("SecondContract")
-
-  // const exampleToken = await deploy("ExampleToken")
-  // const examplePriceOracle = await deploy("ExamplePriceOracle")
-  // const smartContractWallet = await deploy("SmartContractWallet",[exampleToken.address,examplePriceOracle.address])
+  await BankBucks.transfer(
+    "0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8", // your wallet address here
+    utils.parseEther("500")
+  );
 
   /*
   //If you want to send value to an address from the deployer
@@ -78,24 +58,9 @@ const main = async () => {
   })
   */
 
-  /*
-  //If you want to send some ETH to a contract on deploy (make your constructor payable!)
-  const yourContract = await deploy("YourContract", [], {
-  value: ethers.utils.parseEther("0.05")
-  });
-  */
-
-  /*
-  //If you want to link a library into your contract:
-  // reference: https://github.com/austintgriffith/scaffold-eth/blob/using-libraries-example/packages/hardhat/scripts/deploy.js#L19
-  const yourContract = await deploy("YourContract", [], {}, {
-   LibraryName: **LibraryAddress**
-  });
-  */
-
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",
-    chalk.blue("packages/hardhat/artifacts/"),
+    chalk.blue("packages/core/artifacts/"),
     "\n\n"
   );
 };
