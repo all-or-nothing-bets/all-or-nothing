@@ -15,10 +15,11 @@ describe("Bet creation flow", function () {
   let user;
   let link;
   let questionId;
-  let outcomes;
   let amount;
+  let outcomes;
+  let betIds;
 
-  describe("Create bet", function () {
+  describe("Simple flow", function () {
     it("Should deploy contracts", async function () {
       const BankBucks = await ethers.getContractFactory("BankBucks");
       const BankBucksVendor = await ethers.getContractFactory("BankBucksVendor");
@@ -26,6 +27,7 @@ describe("Bet creation flow", function () {
       const ConditionalTokens = await ethers.getContractFactory("ConditionalTokens");
       const CTHelpers = await ethers.getContractFactory("CTHelpers");
       const AMM = await ethers.getContractFactory("AMM");
+      const Oracle = await ethers.getContractFactory("Oracle");
 
       bankBucks = await BankBucks.deploy();
       conditionalTokens = await ConditionalTokens.deploy();
@@ -33,15 +35,15 @@ describe("Bet creation flow", function () {
 
       bankBucksVendor = await BankBucksVendor.deploy(bankBucks.address);
       amm = await AMM.deploy(bankBucks.address, conditionalTokens.address);
+      oracle = await Oracle.deploy(conditionalTokens.address);
 
-      // TODO: change to oracle contract later
-      [user, oracle] = await ethers.getSigners();
+      [user] = await ethers.getSigners();
       
       // Original link is: https://twitter.com/elonmusk/status/1357236825589432322
       // is is shortened down so it fits into 32bytes
       link = 'elonmusk/1357236825589432322';
-      outcomes = ['doge', 'no doge'];
       amount = '200';
+      outcomes = [1,2];
     });
 
     describe(" ", function () {
@@ -55,13 +57,33 @@ describe("Bet creation flow", function () {
         // create bet
         await amm.createBet(oracle.address, questionId, outcomes.length, amount);
 
+        expect(await bankBucks.balanceOf(conditionalTokens.address)).to.equal(amount);
+
         // get ERC1155 ids
         let events = await conditionalTokens.queryFilter('TransferBatch');
-        let ids = events[0].args.ids;
+        betIds = events[0].args.ids;
 
         // check the amount of ERC1155 tokens minted
-        expect(await conditionalTokens.balanceOf(amm.address, ids[0])).to.equal(amount);
-        expect(await conditionalTokens.balanceOf(amm.address, ids[1])).to.equal(amount);
+        expect(await conditionalTokens.balanceOf(amm.address, betIds[0])).to.equal(amount);
+        expect(await conditionalTokens.balanceOf(amm.address, betIds[1])).to.equal(amount);
+      });
+      it("Should buy a position", async function () {
+        // approve tokens to be transfered to amm
+        await bankBucks.approve(amm.address, amount);
+        // create bet
+        await amm.bet(betIds[0], amount);
+
+        // check that the exchange has happened
+        expect(await bankBucks.balanceOf(amm.address)).to.equal(amount);
+        expect(await conditionalTokens.balanceOf(user.address, betIds[0])).to.equal(amount);
+      });
+      it("Should report a payout", async function () {
+          await oracle.reportPayout(questionId, outcomes);
+      });
+      it("Should redeem", async function () {
+          let conditionId = await conditionalTokens.getConditionId(oracle.address, questionId, outcomes.length);
+
+          await amm.redeemTokens(conditionId, outcomes);
       });
     });
   });
