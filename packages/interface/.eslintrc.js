@@ -5,7 +5,7 @@ module.exports = {
   },
   extends: [
     'react-app',
-    'airbnb',
+    'airbnb-base',
     'plugin:jsx-a11y/recommended',
     'prettier',
     'prettier/react',
