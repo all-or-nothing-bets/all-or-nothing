@@ -72,9 +72,11 @@ contract AMM {
         partition[0] = 1;
         partition[1] = 2;
 
+        bytes32 parentCollectionId = bytes32(0);
+
         conditionalTokens.splitPosition(
             collateral,
-            bytes32(0),
+            parentCollectionId,
             conditionId,
             partition,
             initReward
@@ -89,7 +91,7 @@ contract AMM {
             require(indexSet > 0 && indexSet < fullIndexSet, "got invalid index set");
             require((indexSet & freeIndexSet) == indexSet, "partition not disjoint");
             freeIndexSet ^= indexSet;
-            positionIds[i] = CTHelpers.getPositionId(collateral, CTHelpers.getCollectionId(bytes32(0), conditionId, indexSet));
+            positionIds.push(conditionalTokens.getPositionId(collateral, conditionalTokens.getCollectionId(parentCollectionId, conditionId, indexSet)));
             // amounts[i] = amount;
         }
 

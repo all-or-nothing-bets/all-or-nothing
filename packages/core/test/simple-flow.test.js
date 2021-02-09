@@ -18,6 +18,8 @@ describe("Bet creation flow", function () {
   let amount;
   let outcomes;
   let betIds;
+  let bettor1;
+  let bettor2;
 
   describe("Simple flow", function () {
     it("Should deploy contracts", async function () {
@@ -37,13 +39,17 @@ describe("Bet creation flow", function () {
       amm = await AMM.deploy(bankBucks.address, conditionalTokens.address);
       oracle = await Oracle.deploy(conditionalTokens.address);
 
-      [user] = await ethers.getSigners();
+      [user, bettor1, bettor2] = await ethers.getSigners();
       
       // Original link is: https://twitter.com/elonmusk/status/1357236825589432322
       // is is shortened down so it fits into 32bytes
       link = 'elonmusk/1357236825589432322';
       amount = '200';
       outcomes = [1,2];
+
+      // transfer bucks to bettors
+      await bankBucks.transfer(bettor1.address, amount);
+      await bankBucks.transfer(bettor2.address, amount);
     });
 
     describe(" ", function () {
@@ -53,9 +59,11 @@ describe("Bet creation flow", function () {
         questionId = ethers.utils.formatBytes32String(link);
 
         // approve tokens to be transfered to amm
-        await bankBucks.approve(amm.address, amount);
+        await bankBucks.connect(bettor1).approve(amm.address, amount);
+        await bankBucks.connect(bettor2).approve(amm.address, amount);
+
         // create bet
-        await amm.createBet(oracle.address, questionId, outcomes.length, amount);
+        await amm.createWager(bettor1.address, bettor2.address, oracle.address, questionId, outcomes.length, amount);
 
         expect(await bankBucks.balanceOf(conditionalTokens.address)).to.equal(amount);
 
