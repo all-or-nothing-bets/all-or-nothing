@@ -35,7 +35,7 @@ const deploy = async (
 };
 
 const main = async () => {
-  const yourContract = await deploy("YourContract"); // <-- add in constructor args like line 19 vvvv
+  // const yourContract = await deploy("YourContract"); // <-- add in constructor args like line 19 vvvv
 
   const ConditionalTokens = await deploy("ConditionalTokens");
   const CTHelpers = await deploy("CTHelpers");
