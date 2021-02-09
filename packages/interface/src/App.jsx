@@ -25,7 +25,7 @@ import { Transactor } from './helpers';
 
 // import Hints from "./Hints";
 
-import { Subgraph, AllOrNothing, CreateBet, Bets } from './views';
+import { Subgraph, AllOrNothing, CreateBet, Bets, BetConfirmed } from './views';
 // eslint-disable-next-line no-unused-vars
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
 
@@ -303,6 +303,17 @@ Web3 modal helps us "connect" external wallets:
           </Route>
           <Route path='/create-bet'>
             <CreateBet
+              address={address}
+              userProvider={userProvider}
+              mainnetProvider={mainnetProvider}
+              localProvider={localProvider}
+              tx={tx}
+              writeContracts={writeContracts}
+              readContracts={readContracts}
+            />
+          </Route>
+          <Route path='/bets/:questionId/confirmed'>
+            <BetConfirmed
               address={address}
               userProvider={userProvider}
               mainnetProvider={mainnetProvider}

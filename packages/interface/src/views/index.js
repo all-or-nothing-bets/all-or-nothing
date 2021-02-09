@@ -4,3 +4,4 @@ export { default as Subgraph } from './Subgraph';
 export { default as AllOrNothing } from './AllOrNothing';
 export { default as CreateBet } from './CreateBet';
 export { default as Bets } from './Bets';
+export { default as BetConfirmed } from './BetConfirmed';
