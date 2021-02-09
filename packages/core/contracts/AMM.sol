@@ -106,23 +106,50 @@ contract AMM {
         // NOTE: ct's are currently not being moved to the bettors
     }
 
-    function bet(uint amount, uint outcomeIndex, uint minOutcomeTokensToBuy) public {
-        uint outcomeTokensToBuy = calcBuyAmount(amount, outcomeIndex);
-        require(outcomeTokensToBuy >= minOutcomeTokensToBuy, "minimum buy amount not reached");
 
+    function bet(
+        address oracle,
+        bytes32 questionId,
+        uint numOutcomes,
+        uint amount
+    )
+    public
+    {
         require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
+        collateral.approve(address(conditionalTokens), amount);
 
-        uint feeAmount = amount.mul(fee) / ONE;
-        feePoolWeight = feePoolWeight.add(feeAmount);
-        uint amountMinusFees = amount.sub(feeAmount);
-        require(collateral.approve(address(conditionalTokens), amountMinusFees), "approval for splits failed");
-        splitPositionThroughAllConditions(amountMinusFees);
+        bytes32 conditionId = conditionalTokens.getConditionId(oracle, questionId, numOutcomes);
 
-        // TODO: check do we need it or not
-        // conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], outcomeTokensToBuy, "");
+        uint[] memory partition = new uint[](2);
+        partition[0] = 1;
+        partition[1] = 2;
 
-        // emit FPMMBuy(msg.sender, amount, feeAmount, outcomeIndex, outcomeTokensToBuy);
+        bytes32 parentCollectionId = bytes32(0);
+
+        conditionalTokens.splitPosition(
+            collateral,
+            parentCollectionId,
+            conditionId,
+            partition,
+            amount
+        );
     }
+    // function bet(uint amount, uint outcomeIndex, uint minOutcomeTokensToBuy) public {
+    //     uint outcomeTokensToBuy = calcBuyAmount(amount, outcomeIndex);
+    //     require(outcomeTokensToBuy >= minOutcomeTokensToBuy, "minimum buy amount not reached");
+
+    //     require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
+
+    //     uint feeAmount = amount.mul(fee) / ONE;
+    //     feePoolWeight = feePoolWeight.add(feeAmount);
+    //     uint amountMinusFees = amount.sub(feeAmount);
+    //     require(collateral.approve(address(conditionalTokens), amountMinusFees), "approval for splits failed");
+    //     splitPositionThroughAllConditions(amountMinusFees);
+
+    //     conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], outcomeTokensToBuy, "");
+
+    //     // emit FPMMBuy(msg.sender, amount, feeAmount, outcomeIndex, outcomeTokensToBuy);
+    // }
 
 
     // helper functions
