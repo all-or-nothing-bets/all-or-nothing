@@ -59,6 +59,14 @@ contract Wager {
     	parentCollectionId = bytes32(0);
     }
 
+    function getCollateral() external view returns (address) {
+        return address(collateral);
+    }
+
+    function getEndDateTime() external view returns (uint256) {
+        return endDateTime;
+    }
+
     // TODO: add mechanics for betters to withdraw colateral tokens from pool
     function innitialBet(uint amount, uint outcomeIndex) public {
 		// prepare condition
