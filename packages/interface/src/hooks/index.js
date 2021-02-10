@@ -19,3 +19,4 @@ export { default as useConditionId } from './ConditionId';
 export { default as useCollectionId } from './CollectionId';
 export { default as usePositionId } from './PositionId';
 export { default as useCTBalance } from './CTBalance';
+export { default as useWager } from './Wager';

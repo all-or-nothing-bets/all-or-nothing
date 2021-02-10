@@ -9,7 +9,7 @@ contract WagerFactory {
     mapping(bytes32 => address) private wagers;
     address[] private wagerAddresses; // we need this so we can enumerate addresses
 
-    event WagerCreated(address wagerContractAddress);
+    event WagerCreated(bytes32 questionId, address wagerContractAddress);
 
     modifier onlyAdmin {
         require(msg.sender == admin, 'Sender not authorized');
@@ -34,7 +34,7 @@ contract WagerFactory {
     function create(
         address _collateral,
         bytes32 _questionId,
-        uint256 _endDateTime
+        uint256 _endDateTime // UTC timestamp
     ) public returns (address) {
         Wager _wager =
             new Wager(
@@ -47,7 +47,11 @@ contract WagerFactory {
         // _wager.transferOwnership(address(avatar));
         wagers[_questionId] = address(_wager);
         wagerAddresses.push(address(_wager));
-        emit WagerCreated(address(_wager));
+        emit WagerCreated(_questionId, address(_wager));
         return address(_wager);
     }
-}
+
+    function getWager(bytes32 _questionId) external view returns (address) {
+        return wagers[_questionId];
+    }
+  }

@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { formatBytes32String } from '@ethersproject/strings';
 import { parseUnits } from '@ethersproject/units';
 import { Button, DatePicker, Form, Input, Radio, Space, Typography } from 'antd';
+import moment from 'moment';
 import { Collateral } from '../components';
 import './createBet.css';
 

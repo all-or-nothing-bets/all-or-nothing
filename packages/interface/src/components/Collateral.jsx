@@ -1,7 +1,7 @@
 import React from 'react';
-import { Form, Input, Select, Space } from 'antd';
+import { Button, Form, Input, Select, Space } from 'antd';
 
-export default function Collateral() {
+export default function Collateral({ handleApprove }) {
   const { Option } = Select;
   return (
     <Space style={{ margin: 8 }} direction='horizontal'>
@@ -21,6 +21,11 @@ export default function Collateral() {
       </Form.Item>
       <Form.Item name='amount' rules={[{ required: true }]}>
         <Input placeholder='0' type='number' />
+      </Form.Item>
+      <Form.Item>
+        <Button type='default' htmlType='button' onClick={handleApprove}>
+          Approve
+        </Button>
       </Form.Item>
     </Space>
   );

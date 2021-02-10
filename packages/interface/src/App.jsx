@@ -24,14 +24,14 @@ import { Transactor } from './helpers';
 
 // import Hints from "./Hints";
 
-import { CreateBet, Bet, BetConfirmed, TokenBalances } from './views';
+import { Bet, BetOld, CreateBet, BetConfirmed, SetQuestion, TokenBalances } from './views';
 // eslint-disable-next-line no-unused-vars
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
 
 const targetNetwork = NETWORKS.localhost; // localhost, rinkeby, xdai, mainnet
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 
 // 🛰 providers
 if (DEBUG) console.log('📡 Connecting to Mainnet Ethereum');
@@ -111,6 +111,9 @@ function App(props) {
 
   const Condition = useEventListener(readContracts, 'ConditionalTokens', 'ConditionPreparation', localProvider, 1);
   if (Condition.length) console.log('Condition preparation events', Condition);
+
+  const Wagers = useEventListener(readContracts, 'WagerFactory', 'WagerCreated', localProvider, 1);
+  if (Wagers) console.log('WagerCreated', Wagers);
 
   // const Balance = useEventListener(readContracts, 'CTVendor', 'LogCollateralBalance', localProvider, 1);
   // if (Balance.length) console.log('LogCollateralBalance events', Balance);
@@ -216,8 +219,6 @@ Web3 modal helps us "connect" external wallets:
 
   return (
     <div className='App'>
-      <Button type='primary'>test</Button>
-      <a href=''>a test link for you</a>
       <Header />
       {networkDisplay}
       <BrowserRouter>
@@ -240,6 +241,16 @@ Web3 modal helps us "connect" external wallets:
               to='/token-balances'
             >
               Token Balances
+            </Link>
+          </Menu.Item>
+          <Menu.Item key='/set-question'>
+            <Link
+              onClick={() => {
+                setRoute('/set-question');
+              }}
+              to='/set-question'
+            >
+              Set Question
             </Link>
           </Menu.Item>
           <Menu.Item key='/create-bet'>
@@ -301,8 +312,14 @@ Web3 modal helps us "connect" external wallets:
           <Route path='/bets/:questionId/confirmed'>
             <BetConfirmed />
           </Route>
+          <Route path='/set-question'>
+            <SetQuestion tx={tx} writeContracts={writeContracts} />
+          </Route>
           <Route path='/bets/:questionId'>
-            <Bet
+            <Bet tx={tx} writeContracts={writeContracts} />
+          </Route>
+          <Route path='/bets/:questionId/old'>
+            <BetOld
               address={address}
               userProvider={userProvider}
               mainnetProvider={mainnetProvider}

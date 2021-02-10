@@ -45,7 +45,7 @@ contract Wager {
         address _collateral,
         address _conditionalTokens,
         bytes32 _questionId,
-        uint256 _endDateTime
+        uint256 _endDateTime // UTC timestamp
         ) public {
         collateral = IERC20(_collateral);
         conditionalTokens = ConditionalTokens(_conditionalTokens);

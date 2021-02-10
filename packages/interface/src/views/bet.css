@@ -1,0 +1,10 @@
+.ant-radio-group-large .ant-radio-button-wrapper {
+  margin: 10px;
+  height: auto;
+  min-height: 100px;
+  min-width: 150px;
+  display: flex;
+  flex-direction: vertical;
+  align-items: center;
+  justify-content: center;
+}
