@@ -37,13 +37,17 @@ describe("All or Nothing", function () {
 
       wagerFactory = await WagerFactory.deploy(); 
 
-      [user] = await ethers.getSigners();
+      [user, bettor1, bettor2 ] = await ethers.getSigners();
       
       // Original link is: https://twitter.com/elonmusk/status/1357236825589432322
       // is is shortened down so it fits into 32bytes
       link = 'elonmusk/1357236825589432322';
       amount = '200';
       outcomes = [1,2];
+
+      // transfer bucks to bettors
+      await bankBucks.transfer(bettor1.address, amount);
+      await bankBucks.transfer(bettor2.address, amount);
     });
 
     describe(" ", function () {
@@ -59,13 +63,29 @@ describe("All or Nothing", function () {
           wager = Wager.attach(event[0].args[0]);
           
           // set allowance for erc20 token
-          await bankBucks.approve(wager.address, amount);
+          await bankBucks.connect(bettor1).approve(wager.address, amount);
           // set initial bet
-          await wager.innitialBet(amount,0);
+          await wager.connect(bettor1).innitialBet(amount,0);
+
+          expect(await bankBucks.balanceOf(conditionalTokens.address)).to.equal(amount);
+
+          // get ERC1155 ids
+          let events = await conditionalTokens.queryFilter('TransferBatch');
+          betIds = events[0].args.ids;
+
+          // check the amount of ERC1155 tokens minted
+          expect(await conditionalTokens.balanceOf(bettor1.address, betIds[0])).to.equal(amount);
+          expect(await conditionalTokens.balanceOf(wager.address, betIds[1])).to.equal(amount);
       });
-      // it("Should report a payout", async function () {
-      //     await oracle.reportPayout(questionId, outcomes);
-      // });
+      it("Should create a second bet", async function () {
+          // set allowance for erc20 token
+          await bankBucks.connect(bettor2).approve(wager.address, amount);
+          // set initial bet
+          await wager.connect(bettor2).bet(amount,1);
+      });
+      it("Should report a payout", async function () {
+          await oracle.reportPayout(questionId, outcomes);
+      });
       it("Should redeem", async function () {
           // let conditionId = await conditionalTokens.getConditionId(oracle.address, questionId, outcomes.length);
 

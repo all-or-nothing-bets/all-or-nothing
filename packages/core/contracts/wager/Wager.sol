@@ -3,9 +3,7 @@ pragma solidity ^0.6.0;
 import "hardhat/console.sol";
 
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
-
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { ERC1155TokenReceiver } from "@gnosis.pm/conditional-tokens-contracts/contracts/ERC1155/ERC1155TokenReceiver.sol";
 import "../ConditionalTokens.sol";
 
 library CeilDiv {
@@ -16,7 +14,7 @@ library CeilDiv {
     }
 }
 
-contract Wager is ERC1155TokenReceiver {
+contract Wager {
     using SafeMath for uint;
     using CeilDiv  for uint;
 
@@ -100,7 +98,7 @@ contract Wager is ERC1155TokenReceiver {
     
     function bet(uint amount, uint outcomeIndex) public {
 
-        collateral.transferFrom(msg.sender, address(this), amount);
+        require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
     	collateral.approve(address(conditionalTokens), amount);
 
         conditionalTokens.splitPosition(
@@ -181,4 +179,27 @@ contract Wager is ERC1155TokenReceiver {
         }
     }
 
+    function onERC1155Received(
+        address operator,
+        address from,
+        uint256 id,
+        uint256 value,
+        bytes calldata data
+        )
+        external pure
+        returns(bytes4) {
+            return this.onERC1155Received.selector;
+        }
+
+    function onERC1155BatchReceived(
+        address operator,
+        address from,
+        uint256[] calldata ids,
+        uint256[] calldata values,
+        bytes calldata data
+        )
+        external pure
+        returns(bytes4) {
+            return this.onERC1155BatchReceived.selector;
+        }
 }
