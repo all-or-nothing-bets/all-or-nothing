@@ -2,9 +2,8 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
-import 'antd/dist/antd.css';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import './App.css';
+import './App.less';
 import { Row, Col, Button, Menu, Alert } from 'antd';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -217,6 +216,8 @@ Web3 modal helps us "connect" external wallets:
 
   return (
     <div className='App'>
+      <Button type='primary'>test</Button>
+      <a href=''>a test link for you</a>
       <Header />
       {networkDisplay}
       <BrowserRouter>
