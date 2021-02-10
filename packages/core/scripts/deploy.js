@@ -36,9 +36,7 @@ const deploy = async (
 
 const main = async () => {
   const ConditionalTokens = await deploy("ConditionalTokens");
-  const CTHelpers = await deploy("CTHelpers");
   const BankBucks = await deploy("BankBucks");
-
   const CTVendor = await deploy("CTVendor", [
     BankBucks.address,
     ConditionalTokens.address,
@@ -49,17 +47,9 @@ const main = async () => {
     utils.parseEther("500")
   );
 
-  // const Wager = await deploy("Wager");
   const WagerFactory = await deploy("WagerFactory");
-
-  /*
-  //If you want to send value to an address from the deployer
-  const deployerWallet = ethers.provider.getSigner()
-  await deployerWallet.sendTransaction({
-    to: "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-    value: ethers.utils.parseEther("0.001")
-  })
-  */
+  await WagerFactory.setOracle("0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8"); // random address, should be oracle smart contract
+  await WagerFactory.setConditionalTokens(ConditionalTokens.address);
 
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",

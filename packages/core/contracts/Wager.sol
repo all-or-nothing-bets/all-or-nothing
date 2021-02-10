@@ -21,6 +21,8 @@ contract Wager {
     IERC20            public collateral;
     ConditionalTokens public conditionalTokens;
 
+    uint              public endDateTime;
+
     uint constant ONE = 10**18;
     uint constant fee = 1000; // NOTE: hardcoded now maybe should be changed 
 
@@ -42,12 +44,14 @@ contract Wager {
     	address _oracle,
         address _collateral,
         address _conditionalTokens,
-        bytes32 _questionId
+        bytes32 _questionId,
+        uint256 _endDateTime
         ) public {
         collateral = IERC20(_collateral);
         conditionalTokens = ConditionalTokens(_conditionalTokens);
     	oracle = _oracle;
     	questionId = _questionId;
+        endDateTime = _endDateTime;
 
     	partition[0] = 1;
     	partition[1] = 2;
