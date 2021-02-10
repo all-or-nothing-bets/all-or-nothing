@@ -4,7 +4,7 @@ import "hardhat/console.sol";
 
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../ConditionalTokens.sol";
+import "./ConditionalTokens.sol";
 
 library CeilDiv {
     // calculates ceil(x/y)

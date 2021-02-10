@@ -49,6 +49,9 @@ const main = async () => {
     utils.parseEther("500")
   );
 
+  // const Wager = await deploy("Wager");
+  const WagerFactory = await deploy("WagerFactory");
+
   /*
   //If you want to send value to an address from the deployer
   const deployerWallet = ethers.provider.getSigner()
