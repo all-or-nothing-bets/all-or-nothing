@@ -82,13 +82,22 @@ describe("All or Nothing", function () {
           await bankBucks.connect(bettor2).approve(wager.address, amount);
           // set initial bet
           await wager.connect(bettor2).bet(amount,1);
+
+          expect(await conditionalTokens.balanceOf(bettor2.address, betIds[1])).to.equal(amount);
+          expect(await conditionalTokens.balanceOf(wager.address, betIds[0])).to.equal(amount);
+      });
+      it("Should buy tokens from AMM", async function () {
+          await bankBucks.approve(wager.address, amount);
+
+          await wager.buy(100, 0, 50); //TODO: fix magic values
       });
       it("Should report a payout", async function () {
           await oracle.reportPayout(questionId, outcomes);
       });
       it("Should redeem", async function () {
-          // let conditionId = await conditionalTokens.getConditionId(oracle.address, questionId, outcomes.length);
+          // TODO
 
+          // let conditionId = await conditionalTokens.getConditionId(oracle.address, questionId, outcomes.length);
           // await amm.redeemTokens(conditionId, outcomes);
       });
     });

@@ -59,7 +59,7 @@ contract Wager {
     function innitialBet(uint amount, uint outcomeIndex) public {
 		// prepare condition
 		conditionalTokens.prepareCondition(oracle, questionId, 2); // NOTE: number of outcomes is hardcoded, should be changed in the future
-        bytes32 conditionId = conditionalTokens.getConditionId(oracle, questionId, 2); // NOTE: same here
+        conditionId = conditionalTokens.getConditionId(oracle, questionId, 2); // NOTE: same here
 
         collateral.transferFrom(msg.sender, address(this), amount);
     	collateral.approve(address(conditionalTokens), amount);
@@ -97,7 +97,6 @@ contract Wager {
     }
     
     function bet(uint amount, uint outcomeIndex) public {
-
         require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
     	collateral.approve(address(conditionalTokens), amount);
 
