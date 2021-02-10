@@ -316,7 +316,12 @@ Web3 modal helps us "connect" external wallets:
             <SetQuestion tx={tx} writeContracts={writeContracts} />
           </Route>
           <Route path='/bets/:questionId'>
-            <Bet tx={tx} writeContracts={writeContracts} />
+            <Bet
+              signer={userProvider.getSigner()}
+              tx={tx}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+            />
           </Route>
           <Route path='/bets/:questionId/old'>
             <BetOld

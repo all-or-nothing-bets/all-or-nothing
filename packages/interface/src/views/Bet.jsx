@@ -6,10 +6,10 @@ import { parseUnits } from '@ethersproject/units';
 import { isHexString } from '@ethersproject/bytes';
 import { Button, Form, Radio, Space, Typography } from 'antd';
 import { Collateral } from '../components';
-import { useWager } from '../hooks';
+import { useWager, useContractAt, useContractReader, useContractLoader } from '../hooks';
 import './bet.css';
 
-export default function Bet({ tx, writeContracts }) {
+export default function Bet({ signer, tx, readContracts, writeContracts }) {
   const history = useHistory();
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
@@ -17,10 +17,19 @@ export default function Bet({ tx, writeContracts }) {
   const { questionId } = useParams();
   const question = isHexString(questionId) ? parseBytes32String(questionId) : 'Not Found';
 
-  const { BankBucks, CTVendor, WagerFactory } = writeContracts || '';
+  const { BankBucks, CTVendor, Wager, WagerFactory } = writeContracts || '';
 
-  const wager = useWager(WagerFactory, questionId);
+  const oracle = useContractReader(readContracts, 'WagerFactory', 'oracle');
+  console.log('oracle', oracle);
+
+  console.log('readContracts', readContracts);
+  const wagerAddress = useWager(WagerFactory, questionId);
+  console.log('wager', wagerAddress);
+
+  const wager = useContractAt(signer, Wager, wagerAddress);
   console.log('wager', wager);
+  // const wager = useContractLoader('Wager', signer);
+  // console.log('wager contract', wager);
 
   const [form] = Form.useForm();
 

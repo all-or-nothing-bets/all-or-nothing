@@ -1,7 +1,7 @@
 /* eslint no-use-before-define: "warn" */
 const fs = require("fs");
 const chalk = require("chalk");
-const { config, ethers } = require("hardhat");
+const { config, deployments, ethers } = require("hardhat");
 const { utils } = require("ethers");
 const R = require("ramda");
 
@@ -47,10 +47,19 @@ const main = async () => {
     utils.parseEther("500")
   );
 
+  const oracle = "0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8";
+
   const WagerFactory = await deploy("WagerFactory");
-  await WagerFactory.setOracle("0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8"); // random address, should be oracle smart contract
+  await WagerFactory.setOracle(oracle); // random address, should be oracle smart contract
   await WagerFactory.setConditionalTokens(ConditionalTokens.address);
 
+  const Wager = await deploy("Wager", [oracle, BankBucks.address, ConditionalTokens.address, utils.formatBytes32String(0), 0]);
+  // const Wager = await artifacts.readArtifact("Wager");
+  // const Wager2 = await deployments.getArtifact("Wager");
+  // const wager = await Wager.new();
+  // Wager.setAsDeployed(wager);
+  
+  
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",
     chalk.blue("packages/core/artifacts/"),

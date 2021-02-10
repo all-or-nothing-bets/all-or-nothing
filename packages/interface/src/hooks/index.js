@@ -19,4 +19,10 @@ export { default as useConditionId } from './ConditionId';
 export { default as useCollectionId } from './CollectionId';
 export { default as usePositionId } from './PositionId';
 export { default as useCTBalance } from './CTBalance';
+
+// WagerFactory & Wager contract hooks
 export { default as useWager } from './Wager';
+export { default as useCollateral } from './Collateral';
+export { default as useEndDateTime } from './EndDateTime';
+
+export { default as useContractAt } from './ContractAt';

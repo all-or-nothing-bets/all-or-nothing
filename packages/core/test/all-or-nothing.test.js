@@ -51,7 +51,7 @@ describe("All or Nothing", function () {
     });
 
     describe(" ", function () {
-      it("Should create a Wager contract and place innitial bet", async function () {
+      it.only("Should create a Wager contract and place innitial bet", async function () {
           // generate question id from the twitter link
           questionId = ethers.utils.formatBytes32String(link);
 
@@ -61,6 +61,8 @@ describe("All or Nothing", function () {
           let event = await wagerFactory.queryFilter('WagerCreated');
           const Wager = await ethers.getContractFactory("Wager");
           wager = Wager.attach(event[0].args[0]);
+          
+          console.log('event[0]', event[0]);
           
           // set allowance for erc20 token
           await bankBucks.connect(bettor1).approve(wager.address, amount);
