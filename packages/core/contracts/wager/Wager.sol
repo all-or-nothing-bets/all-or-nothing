@@ -5,6 +5,7 @@ import "hardhat/console.sol";
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { ERC1155TokenReceiver } from "@gnosis.pm/conditional-tokens-contracts/contracts/ERC1155/ERC1155TokenReceiver.sol";
 import "../ConditionalTokens.sol";
 
 library CeilDiv {
@@ -15,7 +16,7 @@ library CeilDiv {
     }
 }
 
-contract Wager {
+contract Wager is ERC1155TokenReceiver {
     using SafeMath for uint;
     using CeilDiv  for uint;
 
@@ -43,8 +44,7 @@ contract Wager {
     	address _oracle,
         address _collateral,
         address _conditionalTokens,
-        bytes32 _questionId,
-        bytes32 _conditionId
+        bytes32 _questionId
         ) public {
         collateral = IERC20(_collateral);
         conditionalTokens = ConditionalTokens(_conditionalTokens);
@@ -57,7 +57,11 @@ contract Wager {
     	parentCollectionId = bytes32(0);
     }
 
+    // TODO: add mechanics for betters to withdraw colateral tokens from pool
     function innitialBet(uint amount, uint outcomeIndex) public {
+		// prepare condition
+		conditionalTokens.prepareCondition(oracle, questionId, 2); // NOTE: number of outcomes is hardcoded, should be changed in the future
+        bytes32 conditionId = conditionalTokens.getConditionId(oracle, questionId, 2); // NOTE: same here
 
         collateral.transferFrom(msg.sender, address(this), amount);
     	collateral.approve(address(conditionalTokens), amount);

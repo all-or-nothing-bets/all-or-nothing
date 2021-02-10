@@ -7,7 +7,7 @@ import "../ConditionalTokens.sol";
 
 contract WagerFactory {
 
-    event WagerCreated(address vestingContractAddress);
+    event WagerCreated(address wagerContractAddress);
 
 	function create(
 		address _oracle,
@@ -18,15 +18,10 @@ contract WagerFactory {
 	public
 	returns(address)
 	{
-		// prepare condition
-		ConditionalTokens(_conditionalTokens).prepareCondition(_oracle, _questionId, 2); // NOTE: number of outcomes is hardcoded, should be changed in the future
-		// prepare condition id
-        bytes32 _conditionId = ConditionalTokens(_conditionalTokens).getConditionId(_oracle, _questionId, 2); // NOTE: same here
-
-		Wager _wager = new Wager(_oracle, _collateral, _conditionalTokens, _questionId, _conditionId);
+		Wager _wager = new Wager(_oracle, _collateral, _conditionalTokens, _questionId);
 		// _wager.transferOwnership(address(avatar));
+		emit WagerCreated(address(_wager));
 
 		return address(_wager);
 	}
-
 }
