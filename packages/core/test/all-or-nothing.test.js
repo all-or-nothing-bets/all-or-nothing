@@ -125,11 +125,20 @@ describe("All or Nothing", function () {
       });
 
       it("Should report a payout", async function () {
+          await initBet();
+          await secBet();
+
           await oracle.reportPayout(questionId, outcomes);
       });
-      it.skip("Should redeem", async function () {
-          // TODO
+      it("Should redeem", async function () {
+          await initBet();
+          await secBet();
 
+          await oracle.reportPayout(questionId, outcomes);
+
+          await wager.resolve(0, outcomes);
+
+          await wager.withdraw();
           // let conditionId = await conditionalTokens.getConditionId(oracle.address, questionId, outcomes.length);
           // await amm.redeemTokens(conditionId, outcomes);
       });

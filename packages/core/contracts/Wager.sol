@@ -24,7 +24,6 @@ contract Wager {
     uint              public endDateTime;
 
     uint constant ONE = 10**18;
-    uint constant fee = 1000; // NOTE: hardcoded now maybe should be changed 
 
     uint              internal feePoolWeight;
 
@@ -32,7 +31,7 @@ contract Wager {
     bytes32 		  public questionId;
 	bytes32 		  public conditionId;
     bytes32 		  public parentCollectionId;
-    bytes32[]         public   conditionIds;
+    bytes32[]         public  conditionIds;
 
     uint[]            outcomeSlotCounts;
     bytes32[][]       collectionIds;
@@ -95,8 +94,8 @@ contract Wager {
     // TODO: add mechanics for betters to withdraw colateral tokens from pool
     function initialBet(uint amount, uint outcomeIndex) public notResolved {
         // update init bettors data
-        initBettors.push(msg.sender);
-        initBets.push(outcomeIndex);
+        initBettors[0] = msg.sender;
+        initBets[0] = outcomeIndex;
         initBet.add(amount);
 
         // prepare condition
@@ -139,13 +138,13 @@ contract Wager {
     }
 
     function bet(uint amount, uint outcomeIndex) public notResolved {
-        // todo: add after 1st step only
+        require(initBets[1] >= 0, 'after 1st step only');
 
         // update init bettors data
-        if (initBettors.length == 1){
+        if (initBettors[1] == address(0)){
             require(outcomeIndex != initBets[0], 'should be different bets');
-            initBettors.push(msg.sender);
-            initBets.push(outcomeIndex);
+            initBettors[1] = msg.sender;
+            initBets[1] = outcomeIndex;
             initBet.add(amount);
         }
 
@@ -169,29 +168,26 @@ contract Wager {
 
         require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
 
-        uint feeAmount = amount.mul(fee) / ONE;
-        feePoolWeight = feePoolWeight.add(feeAmount);
-        uint amountMinusFees = amount.sub(feeAmount);
-        require(collateral.approve(address(conditionalTokens), amountMinusFees), "approval for splits failed");
-        splitPositionThroughAllConditions(amountMinusFees);
+        require(collateral.approve(address(conditionalTokens), amount), "approval for splits failed");
+        splitPositionThroughAllConditions(amount);
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], outcomeTokensToBuy, "");
     }
 
     function withdraw() public isResolved {
-        require(!resolved, "wager contract is resolved");
 
-        if (initBet > 0){
-            collateral.transferFrom(address(this), initBettors[resolvedWith], initBet);  
-            initBet = 0;
-        }
-
-        conditionalTokens.redeemPositions(
+        if (conditionalTokens.balanceOf(address(this), positionIds[resolvedWith]) ==  initBet){
+            conditionalTokens.redeemPositions(
             collateral,
             bytes32(0),  // parentCollectionId, here 0 since top-level bet
             conditionId,
             outcomes
-        );
+            );
+
+            collateral.transferFrom(address(this), initBettors[resolvedWith], initBet);  
+            initBet = 0;
+        }
+        require(initBet == 0);
     }
 
     // helper functions
@@ -208,20 +204,19 @@ contract Wager {
         require(outcomeIndex < positionIds.length, "invalid outcome index");
 
         uint[] memory poolBalances = getPoolBalances();
-        uint amountMinusFees = amount.sub(amount.mul(fee) / ONE);
         uint buyTokenPoolBalance = poolBalances[outcomeIndex];
         uint endingOutcomeBalance = buyTokenPoolBalance.mul(ONE);
         for(uint i = 0; i < poolBalances.length; i++) {
             if(i != outcomeIndex) {
                 uint poolBalance = poolBalances[i];
                 endingOutcomeBalance = endingOutcomeBalance.mul(poolBalance).ceildiv(
-                    poolBalance.add(amountMinusFees)
+                    poolBalance.add(amount)
                 );
             }
         }
         require(endingOutcomeBalance > 0, "must have non-zero balances");
 
-        return buyTokenPoolBalance.add(amountMinusFees).sub(endingOutcomeBalance.ceildiv(ONE));
+        return buyTokenPoolBalance.add(amount).sub(endingOutcomeBalance.ceildiv(ONE));
     }
 
     function splitPositionThroughAllConditions(uint amount)
