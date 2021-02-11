@@ -141,12 +141,12 @@ contract Wager {
         require(initBets[1] >= 0, 'after 1st step only');
 
         // update init bettors data
-        // if (initBettors[1] == address(0)){
-        //     require(outcomeIndex != initBets[0], 'should be different bets');
+        if (initBettors[1] == address(0)){
+            require(outcomeIndex != initBets[0], 'should be different bets');
             initBettors[1] = msg.sender;
             initBets[1] = outcomeIndex;
             initBet = initBet.add(amount);
-        // }
+        }
 
         require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
     	collateral.approve(address(conditionalTokens), amount);
@@ -163,15 +163,15 @@ contract Wager {
     }
 
     function buy(uint amount, uint outcomeIndex, uint minOutcomeTokensToBuy) public notResolved {
-        uint outcomeTokensToBuy = calcBuyAmount(amount, outcomeIndex);
-        require(outcomeTokensToBuy >= minOutcomeTokensToBuy, "minimum buy amount not reached");
+        // uint outcomeTokensToBuy = calcBuyAmount(amount, outcomeIndex);
+        // require(outcomeTokensToBuy >= minOutcomeTokensToBuy, "minimum buy amount not reached");
 
         require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
 
         require(collateral.approve(address(conditionalTokens), amount), "approval for splits failed");
-        splitPositionThroughAllConditions(amount);
+        // splitPositionThroughAllConditions(amount);
 
-        conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], outcomeTokensToBuy, "");
+        conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
     }
 
     function withdraw() public isResolved {
