@@ -1,22 +1,18 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { formatBytes32String } from '@ethersproject/strings';
 import { Button, DatePicker, Form, Input, Space, Typography, notification } from 'antd';
-import Notify from 'bnc-notify';
 import { LoadingContext } from '../contexts/loadingContext';
-// import { useEventListener } from '../hooks';
 import { TokenList } from '../components';
 import { parseLocalDateTime } from '../helpers/dateTime';
 import './setQuestion.css';
 
-export default function SetQuestion({ localProvider, tx, readContracts, writeContracts }) {
+export default function SetQuestion({ writeContracts }) {
   const history = useHistory();
   const { setIsLoading } = useContext(LoadingContext);
   const { Title, Text } = Typography;
-  const { BankBucks, WagerFactory } = writeContracts || '';
+  const { WagerFactory } = writeContracts || '';
   const [form] = Form.useForm();
-  // const wagerFactoryEvents = useEventListener(readContracts, 'WagerFactory', 'WagerCreated', localProvider, 1);
-  // console.log('wagerFactoryEvents:', wagerFactoryEvents);
 
   const handleCreateBet = async () => {
     setIsLoading(true);
@@ -25,7 +21,7 @@ export default function SetQuestion({ localProvider, tx, readContracts, writeCon
       const { collateral, question, dateTime } = data;
       const questionId = formatBytes32String(question);
       const timestamp = parseLocalDateTime(dateTime.toDate()); // parsed UTC i.e. in milliseconds
-      await WagerFactory.create(BankBucks.address, questionId, timestamp);
+      await WagerFactory.create(collateral, questionId, timestamp);
       notification.info({ message: 'Setting market question', placement: 'bottomRight' });
       WagerFactory.once('error', error => {
         notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
@@ -36,7 +32,6 @@ export default function SetQuestion({ localProvider, tx, readContracts, writeCon
         setIsLoading(false);
         history.push(`/bets/${questionId}`);
       });
-      // tx(WagerFactory.create(BankBucks.address, questionId, timestamp));
     } catch (error) {
       notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
       setIsLoading(false);

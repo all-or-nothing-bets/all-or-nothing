@@ -1,5 +1,7 @@
 import React from 'react';
 import { Form, Select } from 'antd';
+import BANKBUCKS_ADDRESS from '../contracts/BankBucks.address';
+import { DAI_ADDRESS } from '../constants.js';
 
 export default function TokenList({ size }) {
   const { Option } = Select;
@@ -13,10 +15,8 @@ export default function TokenList({ size }) {
         optionFilterProp='children'
         filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
       >
-        <Option value='BNK'>BankBucks</Option>
-        <Option value='DAI'>DAI</Option>
-        <Option value='USDC'>USDC</Option>
-        <Option value='USDT'>USDT</Option>
+        <Option value={BANKBUCKS_ADDRESS}>BNK</Option>
+        <Option value={DAI_ADDRESS}>DAI</Option>
       </Select>
     </Form.Item>
   );

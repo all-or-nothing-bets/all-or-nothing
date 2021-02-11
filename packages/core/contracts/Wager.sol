@@ -40,6 +40,8 @@ contract Wager {
 
     uint[] partition = new uint[](2);
 
+    event LogInitialBet(address better, uint amount, uint outcomeIndex);
+
     constructor(
     	address _oracle,
         address _collateral,
@@ -106,6 +108,8 @@ contract Wager {
         }
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
+
+        emit LogInitialBet(msg.sender, amount, outcomeIndex);
     }
     
     function bet(uint amount, uint outcomeIndex) public {
