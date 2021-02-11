@@ -1,18 +1,22 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { formatBytes32String } from '@ethersproject/strings';
-import { Button, DatePicker, Form, Input, Space, Typography } from 'antd';
+import { Button, DatePicker, Form, Input, Space, Typography, notification } from 'antd';
+import Notify from 'bnc-notify';
 import { LoadingContext } from '../contexts/loadingContext';
+// import { useEventListener } from '../hooks';
 import { TokenList } from '../components';
 import { parseLocalDateTime } from '../helpers/dateTime';
 import './setQuestion.css';
 
-export default function SetQuestion({ tx, writeContracts }) {
+export default function SetQuestion({ localProvider, tx, readContracts, writeContracts }) {
   const history = useHistory();
   const { setIsLoading } = useContext(LoadingContext);
   const { Title, Text } = Typography;
   const { BankBucks, WagerFactory } = writeContracts || '';
   const [form] = Form.useForm();
+  // const wagerFactoryEvents = useEventListener(readContracts, 'WagerFactory', 'WagerCreated', localProvider, 1);
+  // console.log('wagerFactoryEvents:', wagerFactoryEvents);
 
   const handleCreateBet = async () => {
     setIsLoading(true);
@@ -21,12 +25,22 @@ export default function SetQuestion({ tx, writeContracts }) {
       const { collateral, question, dateTime } = data;
       const questionId = formatBytes32String(question);
       const timestamp = parseLocalDateTime(dateTime.toDate()); // parsed UTC i.e. in milliseconds
+      await WagerFactory.create(BankBucks.address, questionId, timestamp);
+      notification.info({ message: 'Setting market question', placement: 'bottomRight' });
+      WagerFactory.once('error', error => {
+        notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      });
+      WagerFactory.once('WagerCreated', (questionId, wagerContractAddress) => {
+        notification.success({ message: `Success: new question set up!`, placement: 'bottomRight' });
+        console.log(`WagerCreated, questionId ${questionId} wager contrac ${wagerContractAddress}`);
+        setIsLoading(false);
+        history.push(`/bets/${questionId}`);
+      });
       // tx(WagerFactory.create(BankBucks.address, questionId, timestamp));
-      // history.push(`/bets/${questionId}`);
     } catch (error) {
-      console.log('Error creating bet', error);
+      notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const resetFields = () => form.resetFields();

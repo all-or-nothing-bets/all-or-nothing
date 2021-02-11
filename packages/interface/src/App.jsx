@@ -111,10 +111,10 @@ function App(props) {
   // if (DEBUG) console.log('📟 SetPurpose events:', setPurposeEvents);
 
   const Condition = useEventListener(readContracts, 'ConditionalTokens', 'ConditionPreparation', localProvider, 1);
-  if (Condition.length) console.log('Condition preparation events', Condition);
+  // if (Condition.length) console.log('Condition preparation events', Condition);
 
   const Wagers = useEventListener(readContracts, 'WagerFactory', 'WagerCreated', localProvider, 1);
-  if (Wagers) console.log('WagerCreated', Wagers);
+  // if (Wagers) console.log('WagerCreated', Wagers);
 
   // const Balance = useEventListener(readContracts, 'CTVendor', 'LogCollateralBalance', localProvider, 1);
   // if (Balance.length) console.log('LogCollateralBalance events', Balance);
@@ -279,7 +279,12 @@ function App(props) {
               <BetConfirmed />
             </Route>
             <Route path='/set-question'>
-              <SetQuestion tx={tx} writeContracts={writeContracts} />
+              <SetQuestion
+                localProvider={localProvider}
+                readContracts={readContracts}
+                tx={tx}
+                writeContracts={writeContracts}
+              />
             </Route>
             <Route path='/bets/:questionId'>
               <Bet
