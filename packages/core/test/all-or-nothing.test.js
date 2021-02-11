@@ -248,9 +248,10 @@ describe("All or Nothing", function () {
         await wager.connect(bettor3).withdraw();
         let bettor3postwithdrawCollateralBalance = await bankBucks.balanceOf(bettor3.address);
         console.log("Bettor 3 collaterla balance post withdraw", bettor3postwithdrawCollateralBalance.toNumber());
-
+        let CTFCollateralPostBettor3 = await bankBucks.balanceOf(conditionalTokens.address);
+        console.log("CTF collateral", CTFCollateralPostBettor3.toNumber());
         //bettor 4 withdrawal
-        
+
 
 
       });
