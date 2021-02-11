@@ -48,6 +48,8 @@ contract Wager {
     bool resolved;
     uint resolvedWith;
 
+    uint tokensBought = 0;
+
     modifier notResolved() {
         require(!resolved,                      "wager contract is not resolved");
         _;
@@ -162,36 +164,33 @@ contract Wager {
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
     }
 
-    function buy(uint amount, uint outcomeIndex, uint minOutcomeTokensToBuy) public notResolved {
-        // uint outcomeTokensToBuy = calcBuyAmount(amount, outcomeIndex);
-        // require(outcomeTokensToBuy >= minOutcomeTokensToBuy, "minimum buy amount not reached");
-
+    function buy(uint amount, uint outcomeIndex/) public notResolved {
         require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
 
         require(collateral.approve(address(conditionalTokens), amount), "approval for splits failed");
-        // splitPositionThroughAllConditions(amount);
+
+        tokensBought = tokensBought.add(amount);
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
     }
 
     function withdraw() public isResolved {
+        uint sendersTokens = conditionalTokens.balanceOf(msg.sender, positionIds[resolvedWith]);
+        conditionalTokens.safeTransferFrom(msg.sender, address(this), positionIds[resolvedWith], sendersTokens, "");
+
+        conditionalTokens.redeemPositions(
+            collateral,
+            bytes32(0),  // parentCollectionId, here 0 since top-level bet
+            conditionId,
+            outcomes
+            );
+
         if (msg.sender == initBettors[resolvedWith]){
-            uint sendersTokens = conditionalTokens.balanceOf(msg.sender, positionIds[resolvedWith]);
-
-            conditionalTokens.safeTransferFrom(msg.sender, address(this), positionIds[resolvedWith], sendersTokens, "");
-
-            conditionalTokens.redeemPositions(
-                collateral,
-                bytes32(0),  // parentCollectionId, here 0 since top-level bet
-                conditionId,
-                outcomes
-                );
-
                 collateral.transfer(msg.sender, initBet);  
                 initBet = 0;
+        } else {
+            collateral.transfer(msg.sender, sendersTokens); 
         }
-
-        // require(initBet == 0);
     }
 
     // helper functions
@@ -202,47 +201,6 @@ contract Wager {
             thises[i] = address(this);
         }
         return conditionalTokens.balanceOfBatch(thises, positionIds);
-    }
-
-    function calcBuyAmount(uint amount, uint outcomeIndex) public view returns (uint) {
-        require(outcomeIndex < positionIds.length, "invalid outcome index");
-
-        uint[] memory poolBalances = getPoolBalances();
-        uint buyTokenPoolBalance = poolBalances[outcomeIndex];
-        uint endingOutcomeBalance = buyTokenPoolBalance.mul(ONE);
-        for(uint i = 0; i < poolBalances.length; i++) {
-            if(i != outcomeIndex) {
-                uint poolBalance = poolBalances[i];
-                endingOutcomeBalance = endingOutcomeBalance.mul(poolBalance).ceildiv(
-                    poolBalance.add(amount)
-                );
-            }
-        }
-        require(endingOutcomeBalance > 0, "must have non-zero balances");
-
-        return buyTokenPoolBalance.add(amount).sub(endingOutcomeBalance.ceildiv(ONE));
-    }
-
-    function splitPositionThroughAllConditions(uint amount)
-        private
-    {
-        for(uint i = conditionIds.length - 1; int(i) >= 0; i--) {
-            uint[] memory partition = generateBasicPartition(outcomeSlotCounts[i]);
-            for(uint j = 0; j < collectionIds[i].length; j++) {
-                conditionalTokens.splitPosition(collateral, collectionIds[i][j], conditionIds[i], partition, amount);
-            }
-        }
-    }
-
-    function generateBasicPartition(uint outcomeSlotCount)
-        private
-        pure
-        returns (uint[] memory partition)
-    {
-        partition = new uint[](outcomeSlotCount);
-        for(uint i = 0; i < outcomeSlotCount; i++) {
-            partition[i] = 1 << i;
-        }
     }
 
     function onERC1155Received(
