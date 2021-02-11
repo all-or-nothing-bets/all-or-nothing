@@ -39,6 +39,25 @@ contract Wager {
     uint[]            positionIds;
 
     uint[] partition = new uint[](2);
+    uint public initBet = 0;
+
+    address[] initBettors = new address[](2);
+    uint[]    initBets = new uint[](2);
+
+    uint[] outcomes;
+
+    bool resolved;
+    uint resolvedWith;
+
+    modifier notResolved() {
+        require(!resolved,                      "wager contract is not resolved");
+        _;
+    }
+
+    modifier isResolved() {
+        require(resolved,                       "wager contract is resolved");
+        _;
+    }
 
     constructor(
     	address _oracle,
@@ -58,6 +77,12 @@ contract Wager {
 
     	parentCollectionId = bytes32(0);
     }
+    function resolve(uint _resolvedWith, uint[] memory _outcomes) public notResolved {
+        // TODO: add security checks(*payoutNumerators*//*payoutDenominator*)
+        resolved = true;
+        resolvedWith = _resolvedWith;
+        outcomes = _outcomes;
+    }
 
     function getCollateral() external view returns (address) {
         return address(collateral);
@@ -68,8 +93,13 @@ contract Wager {
     }
 
     // TODO: add mechanics for betters to withdraw colateral tokens from pool
-    function innitialBet(uint amount, uint outcomeIndex) public {
-		// prepare condition
+    function innitialBet(uint amount, uint outcomeIndex) public notResolved {
+        // update init bettors data
+        initBettors.push(msg.sender);
+        initBets.push(outcomeIndex);
+        initBet.add(amount);
+
+        // prepare condition
 		conditionalTokens.prepareCondition(oracle, questionId, 2); // NOTE: number of outcomes is hardcoded, should be changed in the future
         conditionId = conditionalTokens.getConditionId(oracle, questionId, 2); // NOTE: same here
 
@@ -107,8 +137,16 @@ contract Wager {
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
     }
-    
-    function bet(uint amount, uint outcomeIndex) public {
+
+    function bet(uint amount, uint outcomeIndex) public notResolved {
+        // update init bettors data
+        if (initBettors.length == 1){
+            require(outcomeIndex != initBets[0], 'should be different bets');
+            initBettors.push(msg.sender);
+            initBets.push(outcomeIndex);
+            initBet.add(amount);
+        }
+
         require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
     	collateral.approve(address(conditionalTokens), amount);
 
@@ -123,7 +161,7 @@ contract Wager {
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
     }
 
-    function buy(uint amount, uint outcomeIndex, uint minOutcomeTokensToBuy) public {
+    function buy(uint amount, uint outcomeIndex, uint minOutcomeTokensToBuy) public notResolved {
         uint outcomeTokensToBuy = calcBuyAmount(amount, outcomeIndex);
         require(outcomeTokensToBuy >= minOutcomeTokensToBuy, "minimum buy amount not reached");
 
@@ -136,6 +174,22 @@ contract Wager {
         splitPositionThroughAllConditions(amountMinusFees);
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], outcomeTokensToBuy, "");
+    }
+
+    function withdraw() public isResolved {
+        require(!resolved, "wager contract is resolved");
+
+        if (initBet > 0){
+            collateral.transferFrom(address(this), initBettors[resolvedWith], initBet);  
+            initBet = 0;
+        }
+
+        conditionalTokens.redeemPositions(
+            collateral,
+            bytes32(0),  // parentCollectionId, here 0 since top-level bet
+            conditionId,
+            outcomes
+        );
     }
 
     // helper functions
