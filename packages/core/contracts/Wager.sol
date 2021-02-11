@@ -186,10 +186,11 @@ contract Wager {
             );
 
         if (msg.sender == initBettors[resolvedWith]){
-                collateral.transfer(msg.sender, initBet);  
-                initBet = 0;
+            collateral.transfer(msg.sender, initBet);  
+            initBet = 0;
         } else {
-            collateral.transfer(msg.sender, sendersTokens); 
+            uint tokensToTransfer = tokensBought.div(sendersTokens);
+            collateral.transfer(msg.sender, sendersTokens.add(tokensToTransfer)); 
         }
     }
 
