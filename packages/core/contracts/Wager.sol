@@ -190,7 +190,7 @@ contract Wager {
         if (msg.sender == initBettors[resolvedWith]){
             collateral.transfer(msg.sender, initBet);  
             initBet = 0;
-        } else if (colateral.balanceOf(address(this)) == sendersTokens) {
+        } else if (collateral.balanceOf(address(this)) == sendersTokens) {
             collateral.transfer(msg.sender, sendersTokens); 
         } else {
             uint tokensToTransfer = tokensBought.div(sendersTokens);
