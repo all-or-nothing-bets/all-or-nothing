@@ -59,6 +59,11 @@ contract Wager {
         _;
     }
 
+    modifier onlyInitialBettors() {
+        require(initBettors[0] == address(0) || initBettors[1] == address(0), "Initial bets have been placed");
+        _;
+    }
+
     constructor(
     	address _oracle,
         address _collateral,
@@ -93,7 +98,7 @@ contract Wager {
     }
 
     // TODO: add mechanics for betters to withdraw colateral tokens from pool
-    function innitialBet(uint amount, uint outcomeIndex) public notResolved {
+    function innitialBet(uint amount, uint outcomeIndex) public notResolved onlyInitialBettors {
         // update init bettors data
         initBettors.push(msg.sender);
         initBets.push(outcomeIndex);
@@ -138,7 +143,7 @@ contract Wager {
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
     }
 
-    function bet(uint amount, uint outcomeIndex) public notResolved {
+    function bet(uint amount, uint outcomeIndex) public notResolved onlyInitialBettors {
         // update init bettors data
         if (initBettors.length == 1){
             require(outcomeIndex != initBets[0], 'should be different bets');

@@ -1,6 +1,7 @@
 const { ethers } = require("hardhat");
 const { use, expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
+//const { accounts, contract } = require('@openzeppelin/test-environment');
 
 use(solidity);
 
@@ -56,11 +57,12 @@ describe("All or Nothing", function () {
     wager = Wager.attach(event[0].args[1]);
 
     // Roles
-    [user, bettor1, bettor2 ] = await ethers.getSigners();
+    [user, bettor1, bettor2, bettor3 ] = await ethers.getSigners();
 
     // Transfer bucks to bettors
     await bankBucks.transfer(bettor1.address, amount);
     await bankBucks.transfer(bettor2.address, amount);
+    await bankBucks.transfer(bettor3.address, amount);
   });
 
     describe(" ", function () {
@@ -85,14 +87,41 @@ describe("All or Nothing", function () {
       it("Should create a second bet", async function () {
 
         // set allowance for erc20 token
+        await bankBucks.connect(bettor1).approve(wager.address, amount);
+        // set initial bet
+        await wager.connect(bettor1).innitialBet(amount,0);
+        // set allowance for erc20 token
         await bankBucks.connect(bettor2).approve(wager.address, amount);
         // set second bet
         await wager.connect(bettor2).bet(amount,1);
+
+        expect(await bankBucks.balanceOf(conditionalTokens.address)).to.equal(amount*2);
+
+         // get ERC1155 ids
+         let events = await conditionalTokens.queryFilter('TransferBatch');
+         betIds = events[0].args.ids;
 
         // check the amount of ERC1155 tokens minted
         expect(await conditionalTokens.balanceOf(bettor2.address, betIds[1])).to.equal(amount);
         expect(await conditionalTokens.balanceOf(wager.address, betIds[0])).to.equal(amount);
       });
+
+      it("Should not allow a third bettor to access innital bet", async function () {
+
+        // set allowance for erc20 token
+        await bankBucks.connect(bettor1).approve(wager.address, amount);
+        // set initial bet
+        await wager.connect(bettor1).innitialBet(amount,0);
+        // set allowance for erc20 token
+        await bankBucks.connect(bettor2).approve(wager.address, amount);
+        // set second bet
+        await wager.connect(bettor2).bet(amount,1);
+        // set allowance for erc20 token
+        await bankBucks.connect(bettor3).approve(wager.address, amount);
+        //expect bettor three to fail initial bet tx 
+        expect(await wager.connect(bettor3).innitialBet(amount,0).fail("Initial bets have been placed"));
+      });
+
 
       it.skip("Should buy tokens from AMM", async function () {
           await bankBucks.approve(wager.address, amount);
