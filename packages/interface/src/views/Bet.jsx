@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
-import { formatBytes32String, parseBytes32String } from '@ethersproject/strings';
+import { parseBytes32String } from '@ethersproject/strings';
 import { parseUnits } from '@ethersproject/units';
 import { isHexString } from '@ethersproject/bytes';
 import { Button, Form, Radio, Space, Typography } from 'antd';
+import { LoadingContext } from '../contexts/loadingContext';
 import { CollateralSelected } from '../components';
 import { useCollateral, useContractAt, useContractReader, useContractLoader, useEndDateTime, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
@@ -14,11 +15,12 @@ export default function Bet({ signer, tx, readContracts, writeContracts }) {
   const history = useHistory();
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
+  const { setIsLoading } = useContext(LoadingContext);
   const { Title, Text } = Typography;
   const { questionId } = useParams();
   const question = isHexString(questionId) ? parseBytes32String(questionId) : 'Not Found';
 
-  const { BankBucks, CTVendor, WagerFactory } = writeContracts || '';
+  const { BankBucks, WagerFactory } = writeContracts || '';
 
   // const collateral = useContractReader(readContracts, 'Wage', 'oracle');
   // console.log('oracle', oracle);
@@ -38,6 +40,7 @@ export default function Bet({ signer, tx, readContracts, writeContracts }) {
 
   const handleApprove = async () => {
     try {
+      setIsLoading(true);
       const data = await form.validateFields();
       // need to import relevant collateral contracts and use them, not BankBucks
       tx(BankBucks.approve(wagerInstance.address, parseUnits(data.amount)));
@@ -47,21 +50,24 @@ export default function Bet({ signer, tx, readContracts, writeContracts }) {
     } catch (error) {
       console.log('Error approving', error);
     }
+    setIsLoading(false);
   };
 
   const handleCreateBet = async () => {
     try {
+      setIsLoading(true);
       const data = await form.validateFields();
       if (!approved) setError('approving wager is required');
       else {
         const { amount, answer } = data;
-        const indexSet = answer === 'yes' ? 1 : 2;
+        const indexSet = answer === 'yes' ? 1 : 0;
         tx(wagerInstance.innitialBet(parseUnits(amount), indexSet));
         history.push(`/bets/${questionId}/confirmed`);
       }
     } catch (error) {
       console.log('Error creating bet', error);
     }
+    setIsLoading(false);
   };
 
   const resetFields = () => form.resetFields();

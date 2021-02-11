@@ -19,6 +19,7 @@ import {
   useBalance,
   // useExternalContractLoader,
 } from './hooks';
+import LoadingContextProvider from './contexts/loadingContext';
 import { Header, Account, Faucet, Ramp, Contract, GasGauge } from './components';
 import { Transactor } from './helpers';
 
@@ -150,29 +151,6 @@ function App(props) {
     );
   }
 
-  /*
-Web3 modal helps us "connect" external wallets:
-*/
-  const web3Modal = new Web3Modal({
-    // network: "mainnet", // optional
-    cacheProvider: true, // optional
-    providerOptions: {
-      walletconnect: {
-        package: WalletConnectProvider, // required
-        options: {
-          infuraId: INFURA_ID,
-        },
-      },
-    },
-  });
-
-  const logoutOfWeb3Modal = async () => {
-    await web3Modal.clearCachedProvider();
-    setTimeout(() => {
-      window.location.reload();
-    }, 1);
-  };
-
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
     setInjectedProvider(new Web3Provider(provider));
@@ -222,58 +200,59 @@ Web3 modal helps us "connect" external wallets:
       <Header />
       {networkDisplay}
       <BrowserRouter>
-        <Menu style={{ textAlign: 'center' }} selectedKeys={[route]} mode='horizontal'>
-          <Menu.Item key='/'>
-            <Link
-              onClick={() => {
-                setRoute('/');
-              }}
-              to='/'
-            >
-              Contract Reader
-            </Link>
-          </Menu.Item>
-          <Menu.Item key='/token-balances'>
-            <Link
-              onClick={() => {
-                setRoute('/token-balances');
-              }}
-              to='/token-balances'
-            >
-              Token Balances
-            </Link>
-          </Menu.Item>
-          <Menu.Item key='/set-question'>
-            <Link
-              onClick={() => {
-                setRoute('/set-question');
-              }}
-              to='/set-question'
-            >
-              Set Question
-            </Link>
-          </Menu.Item>
-        </Menu>
+        <LoadingContextProvider>
+          <Menu style={{ textAlign: 'center' }} selectedKeys={[route]} mode='horizontal'>
+            <Menu.Item key='/'>
+              <Link
+                onClick={() => {
+                  setRoute('/');
+                }}
+                to='/'
+              >
+                Contract Reader
+              </Link>
+            </Menu.Item>
+            <Menu.Item key='/token-balances'>
+              <Link
+                onClick={() => {
+                  setRoute('/token-balances');
+                }}
+                to='/token-balances'
+              >
+                Token Balances
+              </Link>
+            </Menu.Item>
+            <Menu.Item key='/set-question'>
+              <Link
+                onClick={() => {
+                  setRoute('/set-question');
+                }}
+                to='/set-question'
+              >
+                Set Question
+              </Link>
+            </Menu.Item>
+          </Menu>
 
-        <Switch>
-          <Route exact path='/'>
-            <Contract
-              name='CTVendor'
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
+          <Switch>
+            <Route exact path='/'>
+              <Contract
+                name='CTVendor'
+                signer={userProvider.getSigner()}
+                provider={localProvider}
+                address={address}
+                blockExplorer={blockExplorer}
+              />
 
-            <Contract
-              name='BankBucks'
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
+              <Contract
+                name='BankBucks'
+                signer={userProvider.getSigner()}
+                provider={localProvider}
+                address={address}
+                blockExplorer={blockExplorer}
+              />
 
-            {/* Uncomment to display and interact with an external contract (DAI on mainnet):
+              {/* Uncomment to display and interact with an external contract (DAI on mainnet):
             <Contract
               name="DAI"
               customContract={mainnetDAIContract}
@@ -283,45 +262,46 @@ Web3 modal helps us "connect" external wallets:
               blockExplorer={blockExplorer}
             />
             */}
-          </Route>
-          <Route path='/token-balances'>
-            <TokenBalances
-              address={address}
-              userProvider={userProvider}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              f
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-            />
-          </Route>
-          <Route path='/bets/:questionId/confirmed'>
-            <BetConfirmed />
-          </Route>
-          <Route path='/set-question'>
-            <SetQuestion tx={tx} writeContracts={writeContracts} />
-          </Route>
-          <Route path='/bets/:questionId'>
-            <Bet
-              signer={userProvider.getSigner()}
-              tx={tx}
-              readContracts={readContracts}
-              writeContracts={writeContracts}
-            />
-          </Route>
-          <Route path='/bets/:questionId/old'>
-            <BetOld
-              address={address}
-              userProvider={userProvider}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-            />
-          </Route>
-        </Switch>
+            </Route>
+            <Route path='/token-balances'>
+              <TokenBalances
+                address={address}
+                userProvider={userProvider}
+                mainnetProvider={mainnetProvider}
+                localProvider={localProvider}
+                f
+                tx={tx}
+                writeContracts={writeContracts}
+                readContracts={readContracts}
+              />
+            </Route>
+            <Route path='/bets/:questionId/confirmed'>
+              <BetConfirmed />
+            </Route>
+            <Route path='/set-question'>
+              <SetQuestion tx={tx} writeContracts={writeContracts} />
+            </Route>
+            <Route path='/bets/:questionId'>
+              <Bet
+                signer={userProvider.getSigner()}
+                tx={tx}
+                readContracts={readContracts}
+                writeContracts={writeContracts}
+              />
+            </Route>
+            <Route path='/bets/:questionId/old'>
+              <BetOld
+                address={address}
+                userProvider={userProvider}
+                mainnetProvider={mainnetProvider}
+                localProvider={localProvider}
+                tx={tx}
+                writeContracts={writeContracts}
+                readContracts={readContracts}
+              />
+            </Route>
+          </Switch>
+        </LoadingContextProvider>
       </BrowserRouter>
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
@@ -387,6 +367,28 @@ Web3 modal helps us "connect" external wallets:
     </div>
   );
 }
+
+/*
+Web3 modal helps us "connect" external wallets:
+*/
+const web3Modal = new Web3Modal({
+  // network: "mainnet", // optional
+  cacheProvider: true, // optional
+  providerOptions: {
+    walletconnect: {
+      package: WalletConnectProvider, // required
+      options: {
+        infuraId: INFURA_ID,
+      },
+    },
+  },
+});
+const logoutOfWeb3Modal = async () => {
+  await web3Modal.clearCachedProvider();
+  setTimeout(() => {
+    window.location.reload();
+  }, 1);
+};
 
 // eslint-disable-next-line no-unused-expressions
 window.ethereum &&

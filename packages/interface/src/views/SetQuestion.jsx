@@ -1,28 +1,32 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { formatBytes32String } from '@ethersproject/strings';
 import { Button, DatePicker, Form, Input, Space, Typography } from 'antd';
+import { LoadingContext } from '../contexts/loadingContext';
 import { TokenList } from '../components';
 import { parseLocalDateTime } from '../helpers/dateTime';
 import './setQuestion.css';
 
 export default function SetQuestion({ tx, writeContracts }) {
   const history = useHistory();
+  const { setIsLoading } = useContext(LoadingContext);
   const { Title, Text } = Typography;
   const { BankBucks, WagerFactory } = writeContracts || '';
   const [form] = Form.useForm();
 
   const handleCreateBet = async () => {
+    setIsLoading(true);
     try {
       const data = await form.validateFields();
       const { collateral, question, dateTime } = data;
       const questionId = formatBytes32String(question);
       const timestamp = parseLocalDateTime(dateTime.toDate()); // parsed UTC i.e. in milliseconds
-      tx(WagerFactory.create(BankBucks.address, questionId, timestamp));
-      history.push(`/bets/${questionId}`);
+      // tx(WagerFactory.create(BankBucks.address, questionId, timestamp));
+      // history.push(`/bets/${questionId}`);
     } catch (error) {
       console.log('Error creating bet', error);
     }
+    setIsLoading(false);
   };
 
   const resetFields = () => form.resetFields();
