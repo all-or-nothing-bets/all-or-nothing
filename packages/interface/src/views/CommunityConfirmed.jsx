@@ -15,18 +15,24 @@ export default function CommunityConfirmed() {
   const path = `/bets/${questionId}`;
   const tweet = `Put your money where your mouth is 🤑 - "${question}" - I'm challenging you to a bet`;
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 64 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 32 }}>
       <Title>Bet confirmed</Title>
       <Space direction='vertical' size='large'>
         <Text type='secondary'>Fingers crossed!</Text>
         <Title level={4}>
           Save your{' '}
-          <Link to={`${path}/home`} component={Typography.Link}>
-            unique url
+          <Link to={`${path}`} component={Typography.Link}>
+            🏠 home url
           </Link>{' '}
           somewhere safe, you will need it to track your bet
         </Title>
-        <Title level={5}>Invite others to bet against you. </Title>
+        <Title level={5}>
+          Share this{' '}
+          <Link to={`${path}/community`} component={Typography.Link}>
+            💰 bet url
+          </Link>{' '}
+          with others to invite them to bet for or against you. You can win more if other people make bets.{' '}
+        </Title>
         <Card size='large'>{tweet}</Card>
         <TwitterShareButton options={{ text: tweet, via: 'AllOrNothingBet' }} url={`${origin}${path}/community`} />
         <Button type='default' htmlType='button' onClick={withdrawBet}>

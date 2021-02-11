@@ -80,7 +80,7 @@ export default function BetFirst({ signer, tx, readContracts, writeContracts }) 
           notification.success({ message: `Success: bet placed!`, placement: 'bottomRight' });
           console.log(`LogInitialBet, better ${better} amount ${amount} outcomeIndex ${outcomeIndex}`);
           setIsLoading(false);
-          history.push(`/bets/${questionId}/confirmed`);
+          history.push(`/bets/${questionId}/initial-confirmed`);
         });
       }
     } catch (error) {
@@ -92,7 +92,7 @@ export default function BetFirst({ signer, tx, readContracts, writeContracts }) 
   const resetFields = () => form.resetFields();
 
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 64 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 32 }}>
       <Title level={2}>{question}</Title>
       <Form form={form} initialValues={{ answer: 'no' }}>
         <Title level={4}>Place your bet:</Title>

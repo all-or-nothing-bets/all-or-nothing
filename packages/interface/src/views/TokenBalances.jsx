@@ -25,7 +25,7 @@ export default function TokenBalances({
 
   return (
     <div>
-      <div style={{ border: '1px solid #cccccc', padding: 16, width: 400, margin: 'auto', marginTop: 64 }}>
+      <div style={{ border: '1px solid #cccccc', padding: 16, width: 400, margin: 'auto', marginTop: 32 }}>
         <h1>Token Balances</h1>
         <h2>You</h2>
         Address:

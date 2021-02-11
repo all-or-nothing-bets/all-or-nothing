@@ -35,7 +35,7 @@ export default function BetOld({ address, readContracts }) {
   const resetFields = () => form.resetFields();
 
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 64 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 32 }}>
       <Title>{question}</Title>
       <Title level={3}>You've bet</Title>
       <Card size='large'>

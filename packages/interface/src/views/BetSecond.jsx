@@ -102,7 +102,7 @@ export default function BetSecond({ signer, tx, readContracts, writeContracts })
     answer = firstBetOutcomes[0].toString() === '1' ? 'No' : 'Yes';
   }
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 64 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 32 }}>
       <Title level={2}>{question}</Title>
       <Form form={form}>
         <Title level={4}>Place your bet:</Title>

@@ -56,7 +56,7 @@ export default function SetQuestion({ writeContracts }) {
   const resetFields = () => form.resetFields();
 
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 550, margin: 'auto', marginTop: 64 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 550, margin: 'auto', marginTop: 32 }}>
       <Title>Set market question</Title>
       <Form form={form}>
         <div style={{ margin: '8px 0' }}>
@@ -71,7 +71,7 @@ export default function SetQuestion({ writeContracts }) {
           </Form.Item>
         </div>
         {phrase && (
-          <Space direction='horizontal'>
+          <Space style={{ margin: '5px 0 20px 0' }} direction='horizontal'>
             <Card size='large'>
               <Title level={5}>
                 <em>{phrase.yes}</em>

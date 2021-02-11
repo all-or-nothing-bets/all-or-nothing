@@ -225,7 +225,7 @@ function App(props) {
           </Menu>
 
           <Switch>
-            <Route path='/'>
+            <Route exact path='/'>
               <SetQuestion
                 localProvider={localProvider}
                 readContracts={readContracts}
