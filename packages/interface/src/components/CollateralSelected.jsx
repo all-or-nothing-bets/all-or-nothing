@@ -2,23 +2,24 @@ import React from 'react';
 import { Button, Form, Input, Select, Space } from 'antd';
 import BANKBUCKS_ADDRESS from '../contracts/BankBucks.address';
 import { DAI_ADDRESS } from '../constants.js';
+import './collateralSelected.css';
 
-export default function Collateral({ handleApprove }) {
+export default function CollateralSelected({ handleApprove, collateral }) {
   const { Option } = Select;
+  let symbol;
+  switch (collateral) {
+    case BANKBUCKS_ADDRESS:
+      symbol = 'BNK';
+      break;
+    case DAI_ADDRESS:
+      symbol = 'DAI';
+      break;
+    default:
+      symbol = '';
+  }
   return (
     <Space style={{ margin: 8 }} direction='horizontal'>
-      <Form.Item name='collateral' rules={[{ required: true }]}>
-        <Select
-          showSearch
-          style={{ width: 100 }}
-          placeholder='token'
-          optionFilterProp='children'
-          filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-        >
-          <Option value={BANKBUCKS_ADDRESS}>BNK</Option>
-          <Option value={DAI_ADDRESS}>DAI</Option>
-        </Select>
-      </Form.Item>
+      <div className='collateral'>{symbol}</div>
       <Form.Item name='amount' rules={[{ required: true }]}>
         <Input placeholder='0' type='number' />
       </Form.Item>

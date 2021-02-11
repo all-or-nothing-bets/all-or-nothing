@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Contract } from '@ethersproject/contracts';
 
-export default function useContractAt(signer, contract, address) {
+export default function useContractAt(signer, abi, address) {
   const [instance, setInstance] = useState(null);
   useEffect(() => {
-    if (!contract || !address) return;
-    const newInstance = new Contract(address, contract.abi, signer);
+    if (!address) return;
+    const newInstance = new Contract(address, abi, signer);
     setInstance(newInstance);
-  }, [signer, contract, address]);
-
+  }, [signer, address]);
   return instance;
 }

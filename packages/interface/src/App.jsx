@@ -24,7 +24,7 @@ import { Transactor } from './helpers';
 
 // import Hints from "./Hints";
 
-import { Bet, BetOld, CreateBet, BetConfirmed, SetQuestion, TokenBalances } from './views';
+import { Bet, BetOld, BetConfirmed, SetQuestion, TokenBalances } from './views';
 // eslint-disable-next-line no-unused-vars
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
 
@@ -253,16 +253,6 @@ Web3 modal helps us "connect" external wallets:
               Set Question
             </Link>
           </Menu.Item>
-          <Menu.Item key='/create-bet'>
-            <Link
-              onClick={() => {
-                setRoute('/create-bet');
-              }}
-              to='/create-bet'
-            >
-              Create Bet
-            </Link>
-          </Menu.Item>
         </Menu>
 
         <Switch>
@@ -305,9 +295,6 @@ Web3 modal helps us "connect" external wallets:
               writeContracts={writeContracts}
               readContracts={readContracts}
             />
-          </Route>
-          <Route path='/create-bet'>
-            <CreateBet tx={tx} writeContracts={writeContracts} />
           </Route>
           <Route path='/bets/:questionId/confirmed'>
             <BetConfirmed />
