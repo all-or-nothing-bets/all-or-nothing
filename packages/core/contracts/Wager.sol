@@ -60,6 +60,8 @@ contract Wager {
         _;
     }
 
+    event LogInitialBet(address better, uint amount, uint outcomeIndex);
+
     constructor(
     	address _oracle,
         address _collateral,
@@ -138,7 +140,7 @@ contract Wager {
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
 
-
+        emit LogInitialBet(msg.sender, amount, outcomeIndex);
     }
 
     function bet(uint amount, uint outcomeIndex) public notResolved {
