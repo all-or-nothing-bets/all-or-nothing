@@ -137,6 +137,8 @@ contract Wager {
         }
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
+
+
     }
 
     function bet(uint amount, uint outcomeIndex) public notResolved {
@@ -164,7 +166,7 @@ contract Wager {
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
     }
 
-    function buy(uint amount, uint outcomeIndex/) public notResolved {
+    function buy(uint amount, uint outcomeIndex) public notResolved {
         require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
 
         require(collateral.approve(address(conditionalTokens), amount), "approval for splits failed");
