@@ -97,8 +97,9 @@ contract Wager {
         return endDateTime;
     }
 
-    // TODO: add mechanics for betters to withdraw colateral tokens from pool
+    // TODO: add mechanics for betters to withdraw colateral tokens from pool only-initial-bettors
     function innitialBet(uint amount, uint outcomeIndex) public notResolved onlyInitialBettors {
+
         // update init bettors data
         initBettors.push(msg.sender);
         initBets.push(outcomeIndex);
@@ -143,7 +144,9 @@ contract Wager {
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
     }
 
+
     function bet(uint amount, uint outcomeIndex) public notResolved onlyInitialBettors {
+
         // update init bettors data
         if (initBettors.length == 1){
             require(outcomeIndex != initBets[0], 'should be different bets');
