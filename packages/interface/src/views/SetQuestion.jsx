@@ -35,6 +35,7 @@ export default function SetQuestion({ writeContracts }) {
       const { collateral, question, dateTime } = data;
       const questionId = formatBytes32String(question);
       const timestamp = parseLocalDateTime(dateTime.toDate()); // parsed UTC i.e. in milliseconds
+      console.log('timestamp', timestamp);
       await WagerFactory.create(collateral, questionId, timestamp);
       notification.info({ message: 'Setting market question', placement: 'bottomRight' });
       WagerFactory.once('error', error => {
@@ -44,7 +45,7 @@ export default function SetQuestion({ writeContracts }) {
         notification.success({ message: `Success: new question set up!`, placement: 'bottomRight' });
         console.log(`WagerCreated, questionId ${questionId} wager contrac ${wagerContractAddress}`);
         setIsLoading(false);
-        history.push(`/bets/${questionId}`);
+        history.push(`/bets/${questionId}/initial`);
       });
     } catch (error) {
       notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });

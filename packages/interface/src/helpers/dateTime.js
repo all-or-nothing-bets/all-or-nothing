@@ -97,3 +97,43 @@ export const calculateTimeLeft = utcDateTime => {
   }
   return timeLeft;
 };
+
+const convertTimestamp = timestamp => {
+  try {
+    const utcDateTime = new Date(timestamp * 1000);
+    return utcDateTime;
+  } catch (error) {
+    console.log('Error converting timestamp to date');
+  }
+  return '';
+};
+
+const formatDateTime = utcDateTime => {
+  try {
+    if (utcDateTime) {
+      const date = new Date(utcDateTime);
+      if (isValidDate(date)) {
+        let year = date.getFullYear();
+        year = year.toString().substr(-2);
+        const month = date.getMonth();
+        const day = date.getDate();
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours %= 12;
+        hours = hours || 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? `0${minutes}` : minutes;
+        const formattedDateTime = `${month}/${day}/${year}, ${hours}:${minutes} ${ampm}`;
+        return formattedDateTime;
+      }
+    }
+  } catch (error) {
+    console.log('Error formatting date');
+  }
+  return '';
+};
+
+export const showTimestampAsDateTime = timestamp => {
+  const utcDateTime = convertTimestamp(timestamp);
+  return formatDateTime(utcDateTime);
+};

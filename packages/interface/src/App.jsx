@@ -25,7 +25,16 @@ import { Transactor } from './helpers';
 
 // import Hints from "./Hints";
 
-import { Bet, BetSecond, BetOld, BetConfirmed, MatchConfirmed, SetQuestion, TokenBalances } from './views';
+import {
+  BetFirst,
+  BetSecond,
+  BetCommunity,
+  BetConfirmed,
+  MatchConfirmed,
+  BetOld,
+  SetQuestion,
+  TokenBalances,
+} from './views';
 // eslint-disable-next-line no-unused-vars
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
 
@@ -278,6 +287,14 @@ function App(props) {
                 writeContracts={writeContracts}
               />
             </Route>
+            <Route path='/bets/:questionId/initial'>
+              <BetFirst
+                signer={userProvider.getSigner()}
+                tx={tx}
+                readContracts={readContracts}
+                writeContracts={writeContracts}
+              />
+            </Route>
             <Route path='/bets/:questionId/match'>
               <BetSecond
                 signer={userProvider.getSigner()}
@@ -298,7 +315,7 @@ function App(props) {
               />
             </Route>
             <Route path='/bets/:questionId'>
-              <Bet
+              <BetCommunity
                 signer={userProvider.getSigner()}
                 tx={tx}
                 readContracts={readContracts}

@@ -60,6 +60,7 @@ contract Wager {
 
     event LogInitialBet(address better, uint amount, uint outcomeIndex);
     event LogMatchedBet(address better, uint amount, uint outcomeIndex);
+    event LogCommunityBet(address better, uint amount, uint outcomeIndex);
 
     constructor(
     	address _oracle,
@@ -184,6 +185,8 @@ contract Wager {
         splitPositionThroughAllConditions(amount);
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], outcomeTokensToBuy, "");
+
+        emit LogCommunityBet(msg.sender, amount, outcomeIndex);
     }
 
     function withdraw() public isResolved {

@@ -52,6 +52,31 @@
         "type": "uint256"
       }
     ],
+    "name": "LogCommunityBet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "better",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "outcomeIndex",
+        "type": "uint256"
+      }
+    ],
     "name": "LogInitialBet",
     "type": "event"
   },

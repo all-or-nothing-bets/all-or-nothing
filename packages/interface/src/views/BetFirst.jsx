@@ -9,9 +9,9 @@ import { LoadingContext } from '../contexts/loadingContext';
 import { CollateralSelected } from '../components';
 import { useCollateral, useContractAt, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
-import './bet.css';
+import './betFirst.css';
 
-export default function Bet({ signer, tx, readContracts, writeContracts }) {
+export default function BetFirst({ signer, tx, readContracts, writeContracts }) {
   const history = useHistory();
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
