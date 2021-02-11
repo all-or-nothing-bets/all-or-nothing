@@ -4,7 +4,7 @@ import "hardhat/console.sol";
 
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../ConditionalTokens.sol";
+import "./ConditionalTokens.sol";
 
 library CeilDiv {
     // calculates ceil(x/y)
@@ -20,6 +20,8 @@ contract Wager {
 
     IERC20            public collateral;
     ConditionalTokens public conditionalTokens;
+
+    uint              public endDateTime;
 
     uint constant ONE = 10**18;
     uint constant fee = 1000; // NOTE: hardcoded now maybe should be changed 
@@ -61,12 +63,14 @@ contract Wager {
     	address _oracle,
         address _collateral,
         address _conditionalTokens,
-        bytes32 _questionId
+        bytes32 _questionId,
+        uint256 _endDateTime // UTC timestamp
         ) public {
         collateral = IERC20(_collateral);
         conditionalTokens = ConditionalTokens(_conditionalTokens);
     	oracle = _oracle;
     	questionId = _questionId;
+        endDateTime = _endDateTime;
 
     	partition[0] = 1;
     	partition[1] = 2;
@@ -80,8 +84,17 @@ contract Wager {
         outcomes = _outcomes;
     }
 
+    function getCollateral() external view returns (address) {
+        return address(collateral);
+    }
+
+    function getEndDateTime() external view returns (uint256) {
+        return endDateTime;
+    }
+
+    // TODO: add mechanics for betters to withdraw colateral tokens from pool
     function innitialBet(uint amount, uint outcomeIndex) public notResolved {
-		// update init bettors data
+        // update init bettors data
         initBettors.push(msg.sender);
         initBets.push(outcomeIndex);
         initBet.add(amount);

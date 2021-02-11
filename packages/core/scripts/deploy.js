@@ -1,7 +1,7 @@
 /* eslint no-use-before-define: "warn" */
 const fs = require("fs");
 const chalk = require("chalk");
-const { config, ethers } = require("hardhat");
+const { config, deployments, ethers } = require("hardhat");
 const { utils } = require("ethers");
 const R = require("ramda");
 
@@ -36,9 +36,7 @@ const deploy = async (
 
 const main = async () => {
   const ConditionalTokens = await deploy("ConditionalTokens");
-  const CTHelpers = await deploy("CTHelpers");
   const BankBucks = await deploy("BankBucks");
-
   const CTVendor = await deploy("CTVendor", [
     BankBucks.address,
     ConditionalTokens.address,
@@ -49,15 +47,21 @@ const main = async () => {
     utils.parseEther("500")
   );
 
-  /*
-  //If you want to send value to an address from the deployer
-  const deployerWallet = ethers.provider.getSigner()
-  await deployerWallet.sendTransaction({
-    to: "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-    value: ethers.utils.parseEther("0.001")
-  })
-  */
+  const oracle = "0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8";
 
+  const WagerFactory = await deploy("WagerFactory");
+  await WagerFactory.setOracle(oracle); // random address, should be oracle smart contract
+  await WagerFactory.setConditionalTokens(ConditionalTokens.address);
+
+  // hacky way to publish artifact but can't figure out how to get Hardhat to do it
+  // const Wager = await artifacts.readArtifact("Wager");
+  // const publishDir = "../interface/src/abis";
+  // fs.writeFileSync(
+  //   `${publishDir}/Wager.json`,
+  //   JSON.stringify(Wager.abi, null, 2)
+  // );
+  // console.log(chalk.cyan(` 💾 Wager.json published in a hacky way to ${publishDir}`));
+  
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",
     chalk.blue("packages/core/artifacts/"),

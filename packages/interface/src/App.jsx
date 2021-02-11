@@ -2,9 +2,8 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
-import 'antd/dist/antd.css';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import './App.css';
+import './App.less';
 import { Row, Col, Button, Menu, Alert } from 'antd';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -25,14 +24,14 @@ import { Transactor } from './helpers';
 
 // import Hints from "./Hints";
 
-import { CreateBet, Bet, BetConfirmed, TokenBalances } from './views';
+import { Bet, BetOld, BetConfirmed, SetQuestion, TokenBalances } from './views';
 // eslint-disable-next-line no-unused-vars
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
 
 const targetNetwork = NETWORKS.localhost; // localhost, rinkeby, xdai, mainnet
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 
 // 🛰 providers
 if (DEBUG) console.log('📡 Connecting to Mainnet Ethereum');
@@ -112,6 +111,9 @@ function App(props) {
 
   const Condition = useEventListener(readContracts, 'ConditionalTokens', 'ConditionPreparation', localProvider, 1);
   if (Condition.length) console.log('Condition preparation events', Condition);
+
+  const Wagers = useEventListener(readContracts, 'WagerFactory', 'WagerCreated', localProvider, 1);
+  if (Wagers) console.log('WagerCreated', Wagers);
 
   // const Balance = useEventListener(readContracts, 'CTVendor', 'LogCollateralBalance', localProvider, 1);
   // if (Balance.length) console.log('LogCollateralBalance events', Balance);
@@ -241,14 +243,14 @@ Web3 modal helps us "connect" external wallets:
               Token Balances
             </Link>
           </Menu.Item>
-          <Menu.Item key='/create-bet'>
+          <Menu.Item key='/set-question'>
             <Link
               onClick={() => {
-                setRoute('/create-bet');
+                setRoute('/set-question');
               }}
-              to='/create-bet'
+              to='/set-question'
             >
-              Create Bet
+              Set Question
             </Link>
           </Menu.Item>
         </Menu>
@@ -294,14 +296,22 @@ Web3 modal helps us "connect" external wallets:
               readContracts={readContracts}
             />
           </Route>
-          <Route path='/create-bet'>
-            <CreateBet tx={tx} writeContracts={writeContracts} />
-          </Route>
           <Route path='/bets/:questionId/confirmed'>
             <BetConfirmed />
           </Route>
+          <Route path='/set-question'>
+            <SetQuestion tx={tx} writeContracts={writeContracts} />
+          </Route>
           <Route path='/bets/:questionId'>
             <Bet
+              signer={userProvider.getSigner()}
+              tx={tx}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+            />
+          </Route>
+          <Route path='/bets/:questionId/old'>
+            <BetOld
               address={address}
               userProvider={userProvider}
               mainnetProvider={mainnetProvider}
