@@ -19,4 +19,5 @@ export { default as GasGauge } from './GasGauge';
 export { default as ConditionalTokenBalance } from './ConditionalTokenBalance';
 export { default as Collateral } from './Collateral';
 export { default as CollateralSelected } from './CollateralSelected';
+export { default as CollateralAmountSelected } from './CollateralAmountSelected';
 export { default as TokenList } from './TokenList';

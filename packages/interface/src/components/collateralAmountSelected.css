@@ -1,0 +1,15 @@
+div.collateral {
+  width: 100px;
+  height: 33px;
+  margin: 0 0 23px 0;
+  padding: 3px 0 5px 0;
+  border: 1px solid #d9d9d9;
+  border-radius: 15px;
+}
+
+div.ant-space-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}

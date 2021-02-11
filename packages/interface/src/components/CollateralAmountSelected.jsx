@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button, Form, Input, Space } from 'antd';
+import { Button, Form, Space } from 'antd';
 import BANKBUCKS_ADDRESS from '../contracts/BankBucks.address';
 import { DAI_ADDRESS } from '../constants.js';
-import './collateralSelected.css';
+import './collateralAmountSelected.css';
 
-export default function CollateralSelected({ handleApprove, collateral }) {
+export default function CollateralAmountSelected({ handleApprove, collateral, amount }) {
   let symbol;
   switch (collateral) {
     case BANKBUCKS_ADDRESS:
@@ -19,9 +19,7 @@ export default function CollateralSelected({ handleApprove, collateral }) {
   return (
     <Space style={{ margin: 8 }} direction='horizontal'>
       <div className='collateral'>{symbol}</div>
-      <Form.Item name='amount' rules={[{ required: true }]}>
-        <Input placeholder='0' type='number' />
-      </Form.Item>
+      <div className='collateral'>{amount}</div>
       <Form.Item>
         <Button type='default' htmlType='button' onClick={handleApprove}>
           Approve

@@ -25,7 +25,7 @@ import { Transactor } from './helpers';
 
 // import Hints from "./Hints";
 
-import { Bet, BetOld, BetConfirmed, SetQuestion, TokenBalances } from './views';
+import { Bet, BetSecond, BetOld, BetConfirmed, MatchConfirmed, SetQuestion, TokenBalances } from './views';
 // eslint-disable-next-line no-unused-vars
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
 
@@ -212,16 +212,6 @@ function App(props) {
                 Contract Reader
               </Link>
             </Menu.Item>
-            <Menu.Item key='/token-balances'>
-              <Link
-                onClick={() => {
-                  setRoute('/token-balances');
-                }}
-                to='/token-balances'
-              >
-                Token Balances
-              </Link>
-            </Menu.Item>
             <Menu.Item key='/set-question'>
               <Link
                 onClick={() => {
@@ -263,20 +253,22 @@ function App(props) {
             />
             */}
             </Route>
-            <Route path='/token-balances'>
+            <Route path='/bets/:questionId/tokens'>
               <TokenBalances
                 address={address}
-                userProvider={userProvider}
-                mainnetProvider={mainnetProvider}
                 localProvider={localProvider}
-                f
-                tx={tx}
-                writeContracts={writeContracts}
+                mainnetProvider={mainnetProvider}
+                yourLocalBalance={yourLocalBalance}
+                price={price}
                 readContracts={readContracts}
+                signer={userProvider.getSigner()}
               />
             </Route>
             <Route path='/bets/:questionId/confirmed'>
               <BetConfirmed />
+            </Route>
+            <Route path='/bets/:questionId/match-confirmed'>
+              <MatchConfirmed />
             </Route>
             <Route path='/set-question'>
               <SetQuestion
@@ -286,8 +278,8 @@ function App(props) {
                 writeContracts={writeContracts}
               />
             </Route>
-            <Route path='/bets/:questionId'>
-              <Bet
+            <Route path='/bets/:questionId/match'>
+              <BetSecond
                 signer={userProvider.getSigner()}
                 tx={tx}
                 readContracts={readContracts}
@@ -303,6 +295,14 @@ function App(props) {
                 tx={tx}
                 writeContracts={writeContracts}
                 readContracts={readContracts}
+              />
+            </Route>
+            <Route path='/bets/:questionId'>
+              <Bet
+                signer={userProvider.getSigner()}
+                tx={tx}
+                readContracts={readContracts}
+                writeContracts={writeContracts}
               />
             </Route>
           </Switch>

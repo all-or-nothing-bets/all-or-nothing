@@ -59,6 +59,7 @@ contract Wager {
     }
 
     event LogInitialBet(address better, uint amount, uint outcomeIndex);
+    event LogMatchedBet(address better, uint amount, uint outcomeIndex);
 
     constructor(
     	address _oracle,
@@ -93,12 +94,17 @@ contract Wager {
         return endDateTime;
     }
 
+    function getInitBets() external view returns (address[] memory, uint[] memory, uint) {
+        return (initBettors, initBets, initBet);
+    }
+
     // TODO: add mechanics for betters to withdraw colateral tokens from pool
     function initialBet(uint amount, uint outcomeIndex) public notResolved {
         // update init bettors data
         initBettors[0] = msg.sender;
         initBets[0] = outcomeIndex;
-        initBet.add(amount);
+        // initBet.add(amount); // not working for some reason
+        initBet = amount;
 
         // prepare condition
 		conditionalTokens.prepareCondition(oracle, questionId, 2); // NOTE: number of outcomes is hardcoded, should be changed in the future
@@ -164,6 +170,8 @@ contract Wager {
         );
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
+
+        emit LogMatchedBet(msg.sender, amount, outcomeIndex);
     }
 
     function buy(uint amount, uint outcomeIndex, uint minOutcomeTokensToBuy) public notResolved {

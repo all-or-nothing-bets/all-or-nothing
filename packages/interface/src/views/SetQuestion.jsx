@@ -22,7 +22,7 @@ export default function SetQuestion({ writeContracts }) {
     const subject = words.shift();
     const rest = words.toString().split(',').join(' ');
     const yes = `${interrogative} ${subject} ${rest}`;
-    const no = `${interrogative} ${subject} not ${rest}?`;
+    const no = `${interrogative} ${subject} not ${rest}`;
     if (words.length) setPhrase({ yes: yes, no: no });
     // const phrase = `${interrogative} ${subject} ${rest} OR ${interrogative} ${subject} not ${rest}?`;
     // if (words.length) setInput(phrase);

@@ -56,6 +56,31 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "better",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "outcomeIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "LogMatchedBet",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -218,6 +243,42 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getInitBets",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "initBet",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -230,7 +291,7 @@
         "type": "uint256"
       }
     ],
-    "name": "innitialBet",
+    "name": "initialBet",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -350,6 +411,31 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_resolvedWith",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_outcomes",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "resolve",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]
