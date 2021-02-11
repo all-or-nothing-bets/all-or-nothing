@@ -96,7 +96,7 @@ contract Wager {
         // update init bettors data
         initBettors[0] = msg.sender;
         initBets[0] = outcomeIndex;
-        initBet.add(amount);
+        initBet = initBet.add(amount);
 
         // prepare condition
 		conditionalTokens.prepareCondition(oracle, questionId, 2); // NOTE: number of outcomes is hardcoded, should be changed in the future
@@ -141,12 +141,12 @@ contract Wager {
         require(initBets[1] >= 0, 'after 1st step only');
 
         // update init bettors data
-        if (initBettors[1] == address(0)){
-            require(outcomeIndex != initBets[0], 'should be different bets');
+        // if (initBettors[1] == address(0)){
+        //     require(outcomeIndex != initBets[0], 'should be different bets');
             initBettors[1] = msg.sender;
             initBets[1] = outcomeIndex;
-            initBet.add(amount);
-        }
+            initBet = initBet.add(amount);
+        // }
 
         require(collateral.transferFrom(msg.sender, address(this), amount), "cost transfer failed");
     	collateral.approve(address(conditionalTokens), amount);
@@ -175,19 +175,23 @@ contract Wager {
     }
 
     function withdraw() public isResolved {
+        if (msg.sender == initBettors[resolvedWith]){
+            uint sendersTokens = conditionalTokens.balanceOf(msg.sender, positionIds[resolvedWith]);
 
-        if (conditionalTokens.balanceOf(address(this), positionIds[resolvedWith]) ==  initBet){
+            conditionalTokens.safeTransferFrom(msg.sender, address(this), positionIds[resolvedWith], sendersTokens, "");
+
             conditionalTokens.redeemPositions(
-            collateral,
-            bytes32(0),  // parentCollectionId, here 0 since top-level bet
-            conditionId,
-            outcomes
-            );
+                collateral,
+                bytes32(0),  // parentCollectionId, here 0 since top-level bet
+                conditionId,
+                outcomes
+                );
 
-            collateral.transferFrom(address(this), initBettors[resolvedWith], initBet);  
-            initBet = 0;
+                collateral.transfer(msg.sender, initBet);  
+                initBet = 0;
         }
-        require(initBet == 0);
+
+        // require(initBet == 0);
     }
 
     // helper functions

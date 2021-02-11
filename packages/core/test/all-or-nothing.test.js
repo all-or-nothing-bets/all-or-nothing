@@ -19,7 +19,7 @@ describe("All or Nothing", function () {
   let endDateTime;
   let amount;
   let outcomes;
-  // let betIds;
+  let betIds;
 
   const initBet = async () => {
     await bankBucks.connect(bettor1).approve(wager.address, amount);
@@ -64,7 +64,8 @@ describe("All or Nothing", function () {
     link = 'elonmusk/1357236825589432322';
     questionId = ethers.utils.formatBytes32String(link);
     amount = '200';
-    outcomes = [1,2];
+    outcomes = [0,1];
+
     endDateTime = '1613855949';
 
     // create new Wager contract through WagerFactory
@@ -134,13 +135,16 @@ describe("All or Nothing", function () {
           await initBet();
           await secBet();
 
-          await oracle.reportPayout(questionId, outcomes);
+          await oracle.reportPayout(questionId, [1,0]);
+          await wager.resolve(0, [1,2]);
 
-          await wager.resolve(0, outcomes);
+          await conditionalTokens.connect(bettor1).setApprovalForAll(wager.address, true);
 
-          await wager.withdraw();
-          // let conditionId = await conditionalTokens.getConditionId(oracle.address, questionId, outcomes.length);
-          // await amm.redeemTokens(conditionId, outcomes);
+          betIds = await eventIds();
+
+          await wager.connect(bettor1).withdraw();
+
+          expect(await bankBucks.balanceOf(conditionalTokens.address)).to.equal(0);
       });
     });
   });
