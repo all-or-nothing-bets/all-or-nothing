@@ -190,13 +190,15 @@ contract Wager {
         if (msg.sender == initBettors[resolvedWith]){
             collateral.transfer(msg.sender, initBet);  
             initBet = 0;
+        } else if (colateral.balanceOf(address(this)) == sendersTokens) {
+            collateral.transfer(msg.sender, sendersTokens); 
         } else {
             uint tokensToTransfer = tokensBought.div(sendersTokens);
             collateral.transfer(msg.sender, sendersTokens.add(tokensToTransfer)); 
         }
     }
 
-    // helper functions
+    // helpert functions
 
     function getPoolBalances() private view returns (uint[] memory) {
         address[] memory thises = new address[](positionIds.length);
