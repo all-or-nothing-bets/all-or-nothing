@@ -76,7 +76,7 @@ export default function BetCommunity({ signer, tx, readContracts, writeContracts
           notification.success({ message: `Success: bet placed!`, placement: 'bottomRight' });
           console.log(`LogCommunityBet, better ${better} amount ${amount} outcomeIndex ${outcomeIndex}`);
           setIsLoading(false);
-          // history.push(`/bets/${questionId}/confirmed`);
+          history.push(`/bets/${questionId}/community-confirmed`);
         });
       }
     } catch (error) {

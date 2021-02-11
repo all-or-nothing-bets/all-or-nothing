@@ -8,7 +8,7 @@ export default function CollateralAmountSelected({ handleApprove, collateral, am
   let symbol;
   switch (collateral) {
     case BANKBUCKS_ADDRESS:
-      symbol = 'BNK';
+      symbol = 'BKB';
       break;
     case DAI_ADDRESS:
       symbol = 'DAI';

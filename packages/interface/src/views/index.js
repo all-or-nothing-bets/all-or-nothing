@@ -10,5 +10,6 @@ export { default as BetCommunity } from './BetCommunity';
 
 export { default as BetConfirmed } from './BetConfirmed';
 export { default as MatchConfirmed } from './MatchConfirmed';
+export { default as CommunityConfirmed } from './CommunityConfirmed';
 
 export { default as BetOld } from './BetOld';
