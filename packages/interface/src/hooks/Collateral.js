@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import usePoller from './Poller';
 
 export default function useWager(wager, wagerAddress) {
@@ -8,12 +8,14 @@ export default function useWager(wager, wagerAddress) {
 
   usePoller(
     async () => {
-      if (!wager || wagerAddress === '0x0000000000000000000000000000000000000000') return;
-      const getCollateral = async () => {
-        const result = await wager.getCollateral();
-        setCollateral(result);
-      };
-      getCollateral();
+      if (wager && wagerAddress && wagerAddress !== '0x0000000000000000000000000000000000000000') {
+        try {
+          const result = await wager.getCollateral();
+          setCollateral(result);
+        } catch (error) {
+          console.log(error);
+        }
+      }
     },
     pollTime,
     wager && wagerAddress,

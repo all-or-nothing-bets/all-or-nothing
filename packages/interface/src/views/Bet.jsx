@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
-import { formatBytes32String, parseBytes32String } from '@ethersproject/strings';
+import { parseBytes32String } from '@ethersproject/strings';
 import { parseUnits } from '@ethersproject/units';
 import { isHexString } from '@ethersproject/bytes';
-import { Button, Form, Radio, Space, Typography } from 'antd';
+import { Button, Form, Radio, Space, Typography, notification } from 'antd';
+import { LoadingContext } from '../contexts/loadingContext';
 import { CollateralSelected } from '../components';
-import { useCollateral, useContractAt, useContractReader, useContractLoader, useEndDateTime, useWager } from '../hooks';
+import { useCollateral, useContractAt, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
 import './bet.css';
 
@@ -14,53 +15,77 @@ export default function Bet({ signer, tx, readContracts, writeContracts }) {
   const history = useHistory();
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
+  const { setIsLoading } = useContext(LoadingContext);
   const { Title, Text } = Typography;
   const { questionId } = useParams();
   const question = isHexString(questionId) ? parseBytes32String(questionId) : 'Not Found';
 
-  const { BankBucks, CTVendor, WagerFactory } = writeContracts || '';
-
-  // const collateral = useContractReader(readContracts, 'Wage', 'oracle');
-  // console.log('oracle', oracle);
+  const { BankBucks, WagerFactory } = writeContracts || '';
 
   const wagerAddress = useWager(WagerFactory, questionId);
-  console.log('wagerAddress', wagerAddress);
-
-  // console.log('WagerAbi', WagerAbi);
   const wagerInstance = useContractAt(signer, WagerAbi, wagerAddress);
+  const collateral = useCollateral(wagerInstance, wagerAddress);
+
+  console.log('wagerAddress', wagerAddress);
+  console.log('collateral', collateral);
+
+  // const oracle = useContractReader(readContracts, 'Wage', 'oracle');
+  // console.log('oracle', oracle);
+  // console.log('WagerAbi', WagerAbi);
   // console.log('readContracts', readContracts);
   // console.log('wagerInstance', wagerInstance);
-
-  const collateral = useCollateral(wagerInstance, wagerAddress);
-  console.log('collateral', collateral);
 
   const [form] = Form.useForm();
 
   const handleApprove = async () => {
+    setIsLoading(true);
     try {
       const data = await form.validateFields();
       // need to import relevant collateral contracts and use them, not BankBucks
-      tx(BankBucks.approve(wagerInstance.address, parseUnits(data.amount)));
-      // need to wait for transaction approval
+      await BankBucks.approve(wagerInstance.address, parseUnits(data.amount));
+
+      notification.info({ message: 'Approving ERC20 token transfer', placement: 'bottomRight' });
+      BankBucks.once('error', error => {
+        notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      });
+      BankBucks.once('Approval', (owner, spender, value) => {
+        notification.success({ message: `Success: approved ERC20token transfer!`, placement: 'bottomRight' });
+        console.log(`Approval, owner ${owner} spender ${spender} value ${value}`);
+        setIsLoading(false);
+      });
+
       setApproved(true);
       setError(null);
     } catch (error) {
-      console.log('Error approving', error);
+      notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      setIsLoading(false);
     }
   };
 
   const handleCreateBet = async () => {
+    setIsLoading(true);
     try {
       const data = await form.validateFields();
       if (!approved) setError('approving wager is required');
       else {
         const { amount, answer } = data;
-        const indexSet = answer === 'yes' ? 1 : 2;
-        tx(wagerInstance.innitialBet(parseUnits(amount), indexSet));
-        history.push(`/bets/${questionId}/confirmed`);
+        const indexSet = answer === 'yes' ? 1 : 0;
+        await wagerInstance.innitialBet(parseUnits(amount), indexSet);
+
+        notification.info({ message: 'Placing bet', placement: 'bottomRight' });
+        wagerInstance.once('error', error => {
+          notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+        });
+        wagerInstance.once('LogInitialBet', (better, amount, outcomeIndex) => {
+          notification.success({ message: `Success: bet placed!`, placement: 'bottomRight' });
+          console.log(`LogInitialBet, better ${better} amount ${amount} outcomeIndex ${outcomeIndex}`);
+          setIsLoading(false);
+          history.push(`/bets/${questionId}/confirmed`);
+        });
       }
     } catch (error) {
-      console.log('Error creating bet', error);
+      notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      setIsLoading(false);
     }
   };
 

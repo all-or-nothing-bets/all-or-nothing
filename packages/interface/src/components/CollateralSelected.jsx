@@ -5,7 +5,6 @@ import { DAI_ADDRESS } from '../constants.js';
 import './collateralSelected.css';
 
 export default function CollateralSelected({ handleApprove, collateral }) {
-  const { Option } = Select;
   let symbol;
   switch (collateral) {
     case BANKBUCKS_ADDRESS:
