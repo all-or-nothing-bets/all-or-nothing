@@ -19,7 +19,27 @@ describe("All or Nothing", function () {
   let endDateTime;
   let amount;
   let outcomes;
-  let betIds;
+  // let betIds;
+
+  const initBet = async () => {
+    await bankBucks.connect(bettor1).approve(wager.address, amount);
+
+    return await wager.connect(bettor1).initialBet(amount,0);
+
+  };
+
+  const secBet = async () => {
+    await bankBucks.connect(bettor2).approve(wager.address, amount);
+
+    return await wager.connect(bettor2).bet(amount,1);
+
+  };
+
+  const eventIds = async () => {
+    let events = await conditionalTokens.queryFilter('TransferBatch');
+    betIds = events[0].args.ids;
+    return betIds;
+  };
 
   beforeEach(async function () {
     // Get the ContractFactory and Signers here.
@@ -65,17 +85,15 @@ describe("All or Nothing", function () {
 
     describe(" ", function () {
       it("Should place initial bet", async function () {
-      
         // set allowance for erc20 token
         await bankBucks.connect(bettor1).approve(wager.address, amount);
         // set initial bet
-        await wager.connect(bettor1).innitialBet(amount,0);
-
+        await wager.connect(bettor1).initialBet(amount,0);
+        
         expect(await bankBucks.balanceOf(conditionalTokens.address)).to.equal(amount);
 
         // get ERC1155 ids
-        let events = await conditionalTokens.queryFilter('TransferBatch');
-        betIds = events[0].args.ids;
+        betIds = await eventIds();
 
         // check the amount of ERC1155 tokens minted
         expect(await conditionalTokens.balanceOf(bettor1.address, betIds[0])).to.equal(amount);
@@ -83,6 +101,9 @@ describe("All or Nothing", function () {
       });
 
       it("Should create a second bet", async function () {
+        await initBet();
+
+        betIds = await eventIds();
 
         // set allowance for erc20 token
         await bankBucks.connect(bettor2).approve(wager.address, amount);
@@ -94,13 +115,16 @@ describe("All or Nothing", function () {
         expect(await conditionalTokens.balanceOf(wager.address, betIds[0])).to.equal(amount);
       });
 
-      it.skip("Should buy tokens from AMM", async function () {
+      it("Should buy tokens from AMM", async function () {
+          await initBet();
+          await secBet();
+
           await bankBucks.approve(wager.address, amount);
 
           await wager.buy(100, 0, 50); //TODO: fix magic values
       });
 
-      it.skip("Should report a payout", async function () {
+      it("Should report a payout", async function () {
           await oracle.reportPayout(questionId, outcomes);
       });
       it.skip("Should redeem", async function () {

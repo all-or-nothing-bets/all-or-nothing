@@ -93,7 +93,7 @@ contract Wager {
     }
 
     // TODO: add mechanics for betters to withdraw colateral tokens from pool
-    function innitialBet(uint amount, uint outcomeIndex) public notResolved {
+    function initialBet(uint amount, uint outcomeIndex) public notResolved {
         // update init bettors data
         initBettors.push(msg.sender);
         initBets.push(outcomeIndex);
@@ -139,6 +139,8 @@ contract Wager {
     }
 
     function bet(uint amount, uint outcomeIndex) public notResolved {
+        // todo: add after 1st step only
+
         // update init bettors data
         if (initBettors.length == 1){
             require(outcomeIndex != initBets[0], 'should be different bets');
