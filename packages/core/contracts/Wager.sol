@@ -109,7 +109,8 @@ contract Wager {
         // update init bettors data
         initBettors[0] = msg.sender;
         initBets[0] = outcomeIndex;
-        initBet = initBet.add(amount);
+        // initBet = initBet.add(amount);
+        initBet = amount;
 
         // prepare condition
 		conditionalTokens.prepareCondition(oracle, questionId, 2); // NOTE: number of outcomes is hardcoded, should be changed in the future

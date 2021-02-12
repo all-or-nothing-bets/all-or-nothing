@@ -50,6 +50,10 @@ const main = async () => {
     "0x3bA84f8075f2f424ED04d188dC34d8E09607E572", // your wallet address here
     utils.parseEther("500")
   );
+  await BankBucks.transfer(
+    "0xC888Cac1700878844C65Be6AbD8323c9fD921834", // your wallet address here
+    utils.parseEther("500")
+  );
 
   [account0, account1, account2 ] = await ethers.getSigners();
   await BankBucks.transfer(account0.address, utils.parseEther("500"));

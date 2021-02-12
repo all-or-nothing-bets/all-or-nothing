@@ -240,6 +240,7 @@ function App(props) {
                 signer={userProvider.getSigner()}
                 readContracts={readContracts}
                 writeContracts={writeContracts}
+                provider={mainnetProvider}
               />
             </Route>
             <Route path='/bets/:questionId/oracle'>

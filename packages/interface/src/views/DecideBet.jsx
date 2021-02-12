@@ -1,23 +1,21 @@
 import React, { useContext } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { parseBytes32String } from '@ethersproject/strings';
-import { parseUnits } from '@ethersproject/units';
 import { isHexString } from '@ethersproject/bytes';
 import { Button, Space, Typography, notification } from 'antd';
 import { LoadingContext } from '../contexts/loadingContext';
-import { BettorBalance } from '../components';
+import { BettorBalance, TokenBalance } from '../components';
 import { useCollateral, useContractAt, useEndDateTime, useWager } from '../hooks';
 import WagerAbi from '../abis/Wager.json';
 
-export default function DecideBet({ address, signer, readContracts, writeContracts }) {
-  const history = useHistory();
+export default function DecideBet({ address, signer, readContracts, writeContracts, provider }) {
   const { setIsLoading } = useContext(LoadingContext);
   const { Title, Text } = Typography;
 
   const { questionId } = useParams();
   const question = isHexString(questionId) ? parseBytes32String(questionId) : 'Not Found';
 
-  const { BankBucks, ConditionalTokens, WagerFactory } = writeContracts || '';
+  const { ConditionalTokens, WagerFactory } = writeContracts || '';
 
   const wagerAddress = useWager(WagerFactory, questionId);
   const wagerInstance = useContractAt(signer, WagerAbi, wagerAddress);
@@ -34,8 +32,8 @@ export default function DecideBet({ address, signer, readContracts, writeContrac
   let localDateTime;
   if (utcDateTime) localDateTime = utcDateTime.toLocaleDateString('en-US', options);
 
-  const resolvedWith = 0; // no
-  const outcomes = [1, 2]; // yes and no
+  const resolvedWith = 0;
+  const outcomes = [1, 2];
 
   const handleResolve = async () => {
     setIsLoading(true);
@@ -124,6 +122,9 @@ export default function DecideBet({ address, signer, readContracts, writeContrac
       </Space>
       <Title level={4}>Correct answer: NO</Title>
       <Text type='secondary'>This bet ended on {localDateTime}</Text>
+
+      <Title level={5}>Your ERC20 wallet token balance:</Title>
+      <TokenBalance contracts={readContracts} name='BankBucks' address={address} provider={provider} />
     </div>
   );
 }
