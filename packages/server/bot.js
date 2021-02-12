@@ -10,7 +10,7 @@ const bot = new Twit({
 });
 
 // const stream = bot.stream('statuses/filter', { track: 'wager' });
-const stream = bot.stream('statuses/filter', { track: '@michaelbcn' });
+const stream = bot.stream('statuses/filter', { track: 'friendly wager' });
 
 function tweetEvent(tweet) {
   console.log('tweetEvent triggered', tweet);
@@ -20,7 +20,7 @@ function tweetEvent(tweet) {
     text,
     user: { screen_name },
   } = tweet;
-  const reply = `@${screen_name} check out https://miniguide.co`;
+  const reply = `@${screen_name} looks like you are looking to make a little bet? Care to make it official on 🤑 allornothingbet.crypto ? `;
 
   console.log('id', id);
   console.log('tweetText', text);

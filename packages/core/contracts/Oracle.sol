@@ -14,8 +14,11 @@ contract Oracle is Ownable {
         conditionalTokens = IConditionalTokens(_conditionalTokens);
     }
 
+    event LogReportPayout(bytes32 questionId, uint[] payouts);
+
     // would need to restrict calling to onlyOwner
     function reportPayout(bytes32 questionId, uint[] memory payouts) public {
     	conditionalTokens.reportPayouts(questionId, payouts);
+        emit LogReportPayout(questionId, payouts);
     }
 }
