@@ -7,7 +7,7 @@ import { Button, Form, Radio, Space, Typography, notification } from 'antd';
 import { LoadingContext } from '../contexts/loadingContext';
 import { BetEnds, BettorBalance, CollateralSelected } from '../components';
 import { useCollateral, useContractAt, useEndDateTime, useWager } from '../hooks';
-import WagerAbi from '../contracts/Wager.abi';
+import WagerAbi from '../abis/Wager.json';
 
 export default function BettorHome({ address, signer, readContracts, writeContracts }) {
   const history = useHistory();
@@ -24,6 +24,8 @@ export default function BettorHome({ address, signer, readContracts, writeContra
   const wagerAddress = useWager(WagerFactory, questionId);
   const wagerInstance = useContractAt(signer, WagerAbi, wagerAddress);
   const collateral = useCollateral(wagerInstance, wagerAddress);
+
+  console.log('wagerAddress', wagerAddress);
 
   const timestampBN = useEndDateTime(wagerInstance, wagerAddress); // BigNumber timestamp
   let utcDateTime;

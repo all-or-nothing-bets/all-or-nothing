@@ -63,6 +63,8 @@ contract Wager {
     event LogInitialBet(address better, uint amount, uint outcomeIndex);
     event LogMatchedBet(address better, uint amount, uint outcomeIndex);
     event LogCommunityBet(address better, uint amount, uint outcomeIndex);
+    event LogResolve(uint resolvedWith, uint[] outcomes);
+    event LogWithdraw(address better, uint amount);
 
     constructor(
     	address _oracle,
@@ -87,6 +89,7 @@ contract Wager {
         resolved = true;
         resolvedWith = _resolvedWith;
         outcomes = _outcomes;
+        emit LogResolve(resolvedWith, outcomes);
     }
 
     function getCollateral() external view returns (address) {
@@ -106,7 +109,8 @@ contract Wager {
         // update init bettors data
         initBettors[0] = msg.sender;
         initBets[0] = outcomeIndex;
-        initBet = initBet.add(amount);
+        // initBet = initBet.add(amount);
+        initBet = amount;
 
         // prepare condition
 		conditionalTokens.prepareCondition(oracle, questionId, 2); // NOTE: number of outcomes is hardcoded, should be changed in the future
@@ -198,15 +202,21 @@ contract Wager {
             outcomes
             );
 
+        uint amount;
         if (msg.sender == initBettors[resolvedWith]){
-            collateral.transfer(msg.sender, initBet);  
+            collateral.transfer(msg.sender, initBet);
+            amount = initBet;
             initBet = 0;
         } else if (collateral.balanceOf(address(this)) == sendersTokens) {
-            collateral.transfer(msg.sender, sendersTokens); 
+            amount = sendersTokens;
+            collateral.transfer(msg.sender, sendersTokens);
         } else {
             uint tokensToTransfer = tokensBought.div(sendersTokens);
+            amount = tokensToTransfer;
             collateral.transfer(msg.sender, sendersTokens.add(tokensToTransfer)); 
         }
+
+        emit LogWithdraw(msg.sender, amount);
     }
 
     // helpert functions

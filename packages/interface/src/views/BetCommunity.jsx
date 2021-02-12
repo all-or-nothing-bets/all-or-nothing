@@ -8,7 +8,7 @@ import { Button, Form, Radio, Space, Typography, notification } from 'antd';
 import { LoadingContext } from '../contexts/loadingContext';
 import { BetEnds, CollateralSelected } from '../components';
 import { useCollateral, useContractAt, useEndDateTime, useWager } from '../hooks';
-import WagerAbi from '../contracts/Wager.abi';
+import WagerAbi from '../abis/Wager.json';
 
 export default function BetCommunity({ signer, writeContracts }) {
   const history = useHistory();

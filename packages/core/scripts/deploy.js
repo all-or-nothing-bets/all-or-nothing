@@ -50,17 +50,25 @@ const main = async () => {
     "0x3bA84f8075f2f424ED04d188dC34d8E09607E572", // your wallet address here
     utils.parseEther("500")
   );
+  await BankBucks.transfer(
+    "0xC888Cac1700878844C65Be6AbD8323c9fD921834", // your wallet address here
+    utils.parseEther("500")
+  );
 
   [account0, account1, account2 ] = await ethers.getSigners();
   await BankBucks.transfer(account0.address, utils.parseEther("500"));
   await BankBucks.transfer(account1.address, utils.parseEther("500"));
   await BankBucks.transfer(account2.address, utils.parseEther("500"));
 
-  const oracle = "0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8";
+  const Oracle = await deploy("Oracle", [ConditionalTokens.address]);
+
+  // const oracle = "0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8";
 
   const WagerFactory = await deploy("WagerFactory");
-  await WagerFactory.setOracle(oracle); // random address, should be oracle smart contract
+  await WagerFactory.setOracle(Oracle.address);
   await WagerFactory.setConditionalTokens(ConditionalTokens.address);
+
+
 
   // const accounts = await ethers.getSigners();
   // console.log('Accounts')
@@ -68,15 +76,14 @@ const main = async () => {
   //   console.log(account.address);
   // }
 
-
-  // hacky way to publish artifact but can't figure out how to get Hardhat to do it
-  // const Wager = await artifacts.readArtifact("Wager");
-  // const publishDir = "../interface/src/abis";
-  // fs.writeFileSync(
-  //   `${publishDir}/Wager.json`,
-  //   JSON.stringify(Wager.abi, null, 2)
-  // );
-  // console.log(chalk.cyan(` 💾 Wager.json published in a hacky way to ${publishDir}`));
+  // hacky way to publish artifact 
+  const Wager = await artifacts.readArtifact("Wager");
+  const publishDir = "../interface/src/abis";
+  fs.writeFileSync(
+    `${publishDir}/Wager.json`,
+    JSON.stringify(Wager.abi, null, 2)
+  );
+  console.log(chalk.cyan(` 💾 Wager.json published in a hacky way to ${publishDir}`));
   
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",
