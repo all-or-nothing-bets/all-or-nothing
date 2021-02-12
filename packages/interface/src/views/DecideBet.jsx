@@ -3,7 +3,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { parseBytes32String } from '@ethersproject/strings';
 import { parseUnits } from '@ethersproject/units';
 import { isHexString } from '@ethersproject/bytes';
-import { Button, Space, Typography } from 'antd';
+import { Button, Space, Typography, notification } from 'antd';
 import { LoadingContext } from '../contexts/loadingContext';
 import { BettorBalance } from '../components';
 import { useCollateral, useContractAt, useEndDateTime, useWager } from '../hooks';
@@ -17,7 +17,7 @@ export default function DecideBet({ address, signer, readContracts, writeContrac
   const { questionId } = useParams();
   const question = isHexString(questionId) ? parseBytes32String(questionId) : 'Not Found';
 
-  const { BankBucks, WagerFactory } = writeContracts || '';
+  const { BankBucks, ConditionalTokens, WagerFactory } = writeContracts || '';
 
   const wagerAddress = useWager(WagerFactory, questionId);
   const wagerInstance = useContractAt(signer, WagerAbi, wagerAddress);
@@ -34,7 +34,68 @@ export default function DecideBet({ address, signer, readContracts, writeContrac
   let localDateTime;
   if (utcDateTime) localDateTime = utcDateTime.toLocaleDateString('en-US', options);
 
-  const handleRedeem = () => console.log('redeem');
+  const resolvedWith = 0; // no
+  const outcomes = [1, 2]; // yes and no
+
+  const handleResolve = async () => {
+    setIsLoading(true);
+    try {
+      // need to import relevant collateral contracts and use them, not BankBucks
+      await wagerInstance.resolve(resolvedWith, outcomes);
+      notification.info({ message: 'Resolving wager', placement: 'bottomRight' });
+      wagerInstance.once('error', error => {
+        notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      });
+      wagerInstance.once('LogResolve', (resolvedWith, outcomes) => {
+        notification.success({ message: `Bet is resolved`, placement: 'bottomRight' });
+        console.log(`LogResolve, resolvedWith ${resolvedWith} outcomes ${outcomes}`);
+        setIsLoading(false);
+      });
+    } catch (error) {
+      notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      setIsLoading(false);
+    }
+  };
+
+  const handleApprove = async () => {
+    setIsLoading(true);
+    try {
+      // need to import relevant collateral contracts and use them, not BankBucks
+      await ConditionalTokens.setApprovalForAll(wagerInstance.address, true);
+      notification.info({ message: 'Approving withdrawels', placement: 'bottomRight' });
+      ConditionalTokens.once('error', error => {
+        notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      });
+      ConditionalTokens.once('ApprovalForAll', (account, operator, approved) => {
+        notification.success({ message: `Withdrawels are approved`, placement: 'bottomRight' });
+        console.log(`LogResolve, account ${account} operator ${operator} approved ${approved}`);
+        setIsLoading(false);
+      });
+    } catch (error) {
+      notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      setIsLoading(false);
+    }
+  };
+
+  const handleWithdraw = async () => {
+    setIsLoading(true);
+    try {
+      // need to import relevant collateral contracts and use them, not BankBucks
+      await wagerInstance.withdraw();
+      notification.info({ message: 'Withdrawing winnings', placement: 'bottomRight' });
+      wagerInstance.once('error', error => {
+        notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      });
+      wagerInstance.once('LogWithdraw', (better, amount) => {
+        notification.success({ message: `Success: tokens withdrawn!`, placement: 'bottomRight' });
+        console.log(`LogWithdraw, better ${better} amount ${amount}`);
+        setIsLoading(false);
+      });
+    } catch (error) {
+      notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div style={{ border: '1px solid #cccccc', padding: 16, width: 500, margin: 'auto', marginTop: 32 }}>
@@ -50,12 +111,18 @@ export default function DecideBet({ address, signer, readContracts, writeContrac
         />
       </div>
       <Space size='large' direction='vertical'>
-        <Button size='large' type='primary' htmlType='button' onClick={handleRedeem}>
-          Redeem
+        <Button size='large' type='primary' htmlType='button' onClick={handleResolve}>
+          Resolve wager
+        </Button>
+        <Button size='large' type='primary' htmlType='button' onClick={handleApprove}>
+          Approve withdrawels
+        </Button>
+        <Button size='large' type='primary' htmlType='button' onClick={handleWithdraw}>
+          Withdraw tokens
         </Button>
         <Title level={5}>{question}</Title>
       </Space>
-      <Title level={4}>Correct answer: YES</Title>
+      <Title level={4}>Correct answer: NO</Title>
       <Text type='secondary'>This bet ended on {localDateTime}</Text>
     </div>
   );
