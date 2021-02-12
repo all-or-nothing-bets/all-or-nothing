@@ -15,7 +15,7 @@ export default function TokenList({ size }) {
         optionFilterProp='children'
         filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
       >
-        <Option value={BANKBUCKS_ADDRESS}>BNK</Option>
+        <Option value={BANKBUCKS_ADDRESS}>BKB</Option>
         <Option value={DAI_ADDRESS}>DAI</Option>
       </Select>
     </Form.Item>

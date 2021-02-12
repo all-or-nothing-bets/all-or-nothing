@@ -17,6 +17,8 @@ export { default as GasGauge } from './GasGauge';
 
 // All or Nothing components
 export { default as ConditionalTokenBalance } from './ConditionalTokenBalance';
+export { default as BetEnds } from './BetEnds';
 export { default as Collateral } from './Collateral';
 export { default as CollateralSelected } from './CollateralSelected';
+export { default as CollateralAmountSelected } from './CollateralAmountSelected';
 export { default as TokenList } from './TokenList';

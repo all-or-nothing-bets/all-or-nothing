@@ -22,7 +22,7 @@ export default function SetQuestion({ writeContracts }) {
     const subject = words.shift();
     const rest = words.toString().split(',').join(' ');
     const yes = `${interrogative} ${subject} ${rest}`;
-    const no = `${interrogative} ${subject} not ${rest}?`;
+    const no = `${interrogative} ${subject} not ${rest}`;
     if (words.length) setPhrase({ yes: yes, no: no });
     // const phrase = `${interrogative} ${subject} ${rest} OR ${interrogative} ${subject} not ${rest}?`;
     // if (words.length) setInput(phrase);
@@ -35,6 +35,7 @@ export default function SetQuestion({ writeContracts }) {
       const { collateral, question, dateTime } = data;
       const questionId = formatBytes32String(question);
       const timestamp = parseLocalDateTime(dateTime.toDate()); // parsed UTC i.e. in milliseconds
+      console.log('timestamp', timestamp);
       await WagerFactory.create(collateral, questionId, timestamp);
       notification.info({ message: 'Setting market question', placement: 'bottomRight' });
       WagerFactory.once('error', error => {
@@ -44,7 +45,7 @@ export default function SetQuestion({ writeContracts }) {
         notification.success({ message: `Success: new question set up!`, placement: 'bottomRight' });
         console.log(`WagerCreated, questionId ${questionId} wager contrac ${wagerContractAddress}`);
         setIsLoading(false);
-        history.push(`/bets/${questionId}`);
+        history.push(`/bets/${questionId}/initial`);
       });
     } catch (error) {
       notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
@@ -55,7 +56,7 @@ export default function SetQuestion({ writeContracts }) {
   const resetFields = () => form.resetFields();
 
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 550, margin: 'auto', marginTop: 64 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 550, margin: 'auto', marginTop: 32 }}>
       <Title>Set market question</Title>
       <Form form={form}>
         <div style={{ margin: '8px 0' }}>
@@ -70,7 +71,7 @@ export default function SetQuestion({ writeContracts }) {
           </Form.Item>
         </div>
         {phrase && (
-          <Space direction='horizontal'>
+          <Space style={{ margin: '5px 0 20px 0' }} direction='horizontal'>
             <Card size='large'>
               <Title level={5}>
                 <em>{phrase.yes}</em>

@@ -61,6 +61,8 @@ contract Wager {
     }
 
     event LogInitialBet(address better, uint amount, uint outcomeIndex);
+    event LogMatchedBet(address better, uint amount, uint outcomeIndex);
+    event LogCommunityBet(address better, uint amount, uint outcomeIndex);
 
     constructor(
     	address _oracle,
@@ -93,6 +95,10 @@ contract Wager {
 
     function getEndDateTime() external view returns (uint256) {
         return endDateTime;
+    }
+
+    function getInitBets() external view returns (address[] memory, uint[] memory, uint) {
+        return (initBettors, initBets, initBet);
     }
 
     // TODO: add mechanics for betters to withdraw colateral tokens from pool
@@ -166,6 +172,8 @@ contract Wager {
         );
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
+
+        emit LogMatchedBet(msg.sender, amount, outcomeIndex);
     }
 
     function buy(uint amount, uint outcomeIndex) public notResolved {
@@ -176,6 +184,7 @@ contract Wager {
         tokensBought = tokensBought.add(amount);
 
         conditionalTokens.safeTransferFrom(address(this), msg.sender, positionIds[outcomeIndex], amount, "");
+        emit LogCommunityBet(msg.sender, amount, outcomeIndex);
     }
 
     function withdraw() public isResolved {

@@ -24,5 +24,6 @@ export { default as useCTBalance } from './CTBalance';
 export { default as useWager } from './Wager';
 export { default as useCollateral } from './Collateral';
 export { default as useEndDateTime } from './EndDateTime';
+export { default as useInitBets } from './InitBets';
 
 export { default as useContractAt } from './ContractAt';

@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { formatBytes32String } from '@ethersproject/strings';
 import { formatUnits } from '@ethersproject/units';
 
 export default function ConditionalTokenBalance(props) {
-
   const collateral = props.contracts && props.contracts[props.collateral];
   const conditional = props.contracts && props.contracts[props.conditional];
   const { address } = props;
@@ -52,7 +51,6 @@ export default function ConditionalTokenBalance(props) {
 
   // const conditionId = useContractReader(props.contracts, "CTVendor", "conditionId");
 
-  console.log('ctVendor', ctVendor);
   // const balance = useTokenBalance(tokenContract, props.address, 1777);
 
   // console.log("collateralToken", collateral);
@@ -60,7 +58,7 @@ export default function ConditionalTokenBalance(props) {
   // console.log("address", address);
   // console.log("conditionId", conditionId);
 
-  let floatBalance = parseFloat("0.00");
+  let floatBalance = parseFloat('0.00');
 
   // let usingBalance = balance;
 
@@ -83,7 +81,7 @@ export default function ConditionalTokenBalance(props) {
   return (
     <span
       style={{
-        verticalAlign: "middle",
+        verticalAlign: 'middle',
         fontSize: 14,
         padding: 8,
       }}
@@ -95,7 +93,7 @@ export default function ConditionalTokenBalance(props) {
       <br />
       PositionId: {positionId.toString()}
       <br />
-      Balance: {balance ? formatUnits(balance, 18) : ""}
+      Balance: {balance ? formatUnits(balance, 18) : ''}
     </span>
   );
 }

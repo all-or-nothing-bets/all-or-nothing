@@ -6,17 +6,18 @@ import { parseUnits } from '@ethersproject/units';
 import { isHexString } from '@ethersproject/bytes';
 import { Button, Form, Radio, Space, Typography, notification } from 'antd';
 import { LoadingContext } from '../contexts/loadingContext';
-import { CollateralSelected } from '../components';
-import { useCollateral, useContractAt, useWager } from '../hooks';
+import { BetEnds, CollateralSelected } from '../components';
+import { useCollateral, useContractAt, useEndDateTime, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
-import './bet.css';
+import './betCommunity.css';
 
-export default function Bet({ signer, tx, readContracts, writeContracts }) {
+export default function BetCommunity({ signer, tx, readContracts, writeContracts }) {
   const history = useHistory();
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
   const { setIsLoading } = useContext(LoadingContext);
   const { Title, Text } = Typography;
+
   const { questionId } = useParams();
   const question = isHexString(questionId) ? parseBytes32String(questionId) : 'Not Found';
 
@@ -26,14 +27,9 @@ export default function Bet({ signer, tx, readContracts, writeContracts }) {
   const wagerInstance = useContractAt(signer, WagerAbi, wagerAddress);
   const collateral = useCollateral(wagerInstance, wagerAddress);
 
-  console.log('wagerAddress', wagerAddress);
-  console.log('collateral', collateral);
-
-  // const oracle = useContractReader(readContracts, 'Wage', 'oracle');
-  // console.log('oracle', oracle);
-  // console.log('WagerAbi', WagerAbi);
-  // console.log('readContracts', readContracts);
-  // console.log('wagerInstance', wagerInstance);
+  const timestampBN = useEndDateTime(wagerInstance, wagerAddress); // BigNumber timestamp
+  let utcDateTime;
+  if (timestampBN) utcDateTime = new Date(+timestampBN.toString());
 
   const [form] = Form.useForm();
 
@@ -70,17 +66,17 @@ export default function Bet({ signer, tx, readContracts, writeContracts }) {
       else {
         const { amount, answer } = data;
         const indexSet = answer === 'yes' ? 1 : 0;
-        await wagerInstance.innitialBet(parseUnits(amount), indexSet);
+        await wagerInstance.buy(parseUnits(amount), indexSet, 1);
 
         notification.info({ message: 'Placing bet', placement: 'bottomRight' });
         wagerInstance.once('error', error => {
           notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
         });
-        wagerInstance.once('LogInitialBet', (better, amount, outcomeIndex) => {
+        wagerInstance.once('LogCommunityBet', (better, amount, outcomeIndex) => {
           notification.success({ message: `Success: bet placed!`, placement: 'bottomRight' });
-          console.log(`LogInitialBet, better ${better} amount ${amount} outcomeIndex ${outcomeIndex}`);
+          console.log(`LogCommunityBet, better ${better} amount ${amount} outcomeIndex ${outcomeIndex}`);
           setIsLoading(false);
-          history.push(`/bets/${questionId}/confirmed`);
+          history.push(`/bets/${questionId}/community-confirmed`);
         });
       }
     } catch (error) {
@@ -92,7 +88,7 @@ export default function Bet({ signer, tx, readContracts, writeContracts }) {
   const resetFields = () => form.resetFields();
 
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 64 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 32 }}>
       <Title level={2}>{question}</Title>
       <Form form={form} initialValues={{ answer: 'no' }}>
         <Title level={4}>Place your bet:</Title>
@@ -101,27 +97,33 @@ export default function Bet({ signer, tx, readContracts, writeContracts }) {
             <Radio.Group size='large'>
               <Space direction='horizontal'>
                 <Radio.Button value='yes'>
-                  <Text style={{ fontSize: 24, fontWeight: 600 }}>Yes</Text>
+                  <Text style={{ fontSize: 24 }}>
+                    <strong>Yes</strong>, I think so
+                  </Text>
                 </Radio.Button>
                 <Radio.Button value='no'>
-                  <Text style={{ fontSize: 24, fontWeight: 600 }}>No</Text>
+                  <Text style={{ fontSize: 24 }}>
+                    <strong>No</strong>, I don't think so
+                  </Text>
                 </Radio.Button>
               </Space>
             </Radio.Group>
           </Form.Item>
         </div>
-        <div style={{ margin: 16 }}>
+        <BetEnds utcDateTime={utcDateTime} />
+        <div style={{ marginTop: 32 }}>
+          <Title level={4}>How much will you wager?</Title>
           <CollateralSelected collateral={collateral} handleApprove={handleApprove} />
         </div>
         <Space direction='horizontal'>
-          {/* <Form.Item>
+          <Form.Item>
             <Button size='large' type='default' htmlType='button' onClick={resetFields}>
-              Cancel
+              Reset
             </Button>
-          </Form.Item> */}
+          </Form.Item>
           <Form.Item>
             <Button size='large' type='primary' htmlType='button' onClick={handleCreateBet}>
-              Place initial bet
+              Place bet
             </Button>
           </Form.Item>
         </Space>

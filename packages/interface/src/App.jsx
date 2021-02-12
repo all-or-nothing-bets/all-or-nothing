@@ -20,14 +20,24 @@ import {
   // useExternalContractLoader,
 } from './hooks';
 import LoadingContextProvider from './contexts/loadingContext';
-import { Header, Account, Faucet, Ramp, Contract, GasGauge } from './components';
+import { Header, Account, Faucet, Ramp, GasGauge } from './components';
 import { Transactor } from './helpers';
 
 // import Hints from "./Hints";
 
-import { Bet, BetOld, BetConfirmed, SetQuestion, TokenBalances } from './views';
+import {
+  BetFirst,
+  BetSecond,
+  BetCommunity,
+  BetConfirmed,
+  MatchConfirmed,
+  CommunityConfirmed,
+  BetOld,
+  SetQuestion,
+  TokenBalances,
+} from './views';
 // eslint-disable-next-line no-unused-vars
-import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
+import { INFURA_ID, NETWORK, NETWORKS } from './constants';
 
 const targetNetwork = NETWORKS.localhost; // localhost, rinkeby, xdai, mainnet
 
@@ -209,26 +219,6 @@ function App(props) {
                 }}
                 to='/'
               >
-                Contract Reader
-              </Link>
-            </Menu.Item>
-            <Menu.Item key='/token-balances'>
-              <Link
-                onClick={() => {
-                  setRoute('/token-balances');
-                }}
-                to='/token-balances'
-              >
-                Token Balances
-              </Link>
-            </Menu.Item>
-            <Menu.Item key='/set-question'>
-              <Link
-                onClick={() => {
-                  setRoute('/set-question');
-                }}
-                to='/set-question'
-              >
                 Set Question
               </Link>
             </Menu.Item>
@@ -236,49 +226,6 @@ function App(props) {
 
           <Switch>
             <Route exact path='/'>
-              <Contract
-                name='CTVendor'
-                signer={userProvider.getSigner()}
-                provider={localProvider}
-                address={address}
-                blockExplorer={blockExplorer}
-              />
-
-              <Contract
-                name='BankBucks'
-                signer={userProvider.getSigner()}
-                provider={localProvider}
-                address={address}
-                blockExplorer={blockExplorer}
-              />
-
-              {/* Uncomment to display and interact with an external contract (DAI on mainnet):
-            <Contract
-              name="DAI"
-              customContract={mainnetDAIContract}
-              signer={userProvider.getSigner()}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-            */}
-            </Route>
-            <Route path='/token-balances'>
-              <TokenBalances
-                address={address}
-                userProvider={userProvider}
-                mainnetProvider={mainnetProvider}
-                localProvider={localProvider}
-                f
-                tx={tx}
-                writeContracts={writeContracts}
-                readContracts={readContracts}
-              />
-            </Route>
-            <Route path='/bets/:questionId/confirmed'>
-              <BetConfirmed />
-            </Route>
-            <Route path='/set-question'>
               <SetQuestion
                 localProvider={localProvider}
                 readContracts={readContracts}
@@ -286,12 +233,48 @@ function App(props) {
                 writeContracts={writeContracts}
               />
             </Route>
-            <Route path='/bets/:questionId'>
-              <Bet
+            <Route path='/bets/:questionId/initial'>
+              <BetFirst
                 signer={userProvider.getSigner()}
                 tx={tx}
                 readContracts={readContracts}
                 writeContracts={writeContracts}
+              />
+            </Route>
+            <Route path='/bets/:questionId/match'>
+              <BetSecond
+                signer={userProvider.getSigner()}
+                tx={tx}
+                readContracts={readContracts}
+                writeContracts={writeContracts}
+              />
+            </Route>
+            <Route path='/bets/:questionId/community'>
+              <BetCommunity
+                signer={userProvider.getSigner()}
+                tx={tx}
+                readContracts={readContracts}
+                writeContracts={writeContracts}
+              />
+            </Route>
+            <Route path='/bets/:questionId/initial-confirmed'>
+              <BetConfirmed />
+            </Route>
+            <Route path='/bets/:questionId/match-confirmed'>
+              <MatchConfirmed />
+            </Route>
+            <Route path='/bets/:questionId/community-confirmed'>
+              <CommunityConfirmed />
+            </Route>
+            <Route path='/bets/:questionId/tokens'>
+              <TokenBalances
+                address={address}
+                localProvider={localProvider}
+                mainnetProvider={mainnetProvider}
+                yourLocalBalance={yourLocalBalance}
+                price={price}
+                readContracts={readContracts}
+                signer={userProvider.getSigner()}
               />
             </Route>
             <Route path='/bets/:questionId/old'>
