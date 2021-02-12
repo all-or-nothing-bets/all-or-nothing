@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import './App.less';
+import './App.css';
 import { Row, Col, Button, Menu, Alert } from 'antd';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -33,9 +33,8 @@ import {
   MatchConfirmed,
   CommunityConfirmed,
   BettorHome,
-  BetOld,
+  DecideBet,
   SetQuestion,
-  TokenBalances,
 } from './views';
 // eslint-disable-next-line no-unused-vars
 import { INFURA_ID, NETWORK, NETWORKS } from './constants';
@@ -212,50 +211,18 @@ function App(props) {
       {networkDisplay}
       <BrowserRouter>
         <LoadingContextProvider>
-          {/* <Menu style={{ textAlign: 'center' }} selectedKeys={[route]} mode='horizontal'>
-            <Menu.Item key='/'>
-              <Link
-                onClick={() => {
-                  setRoute('/');
-                }}
-                to='/'
-              >
-                Set Question
-              </Link>
-            </Menu.Item>
-          </Menu> */}
           <Switch>
             <Route exact path='/'>
-              <SetQuestion
-                localProvider={localProvider}
-                readContracts={readContracts}
-                tx={tx}
-                writeContracts={writeContracts}
-              />
+              <SetQuestion writeContracts={writeContracts} />
             </Route>
             <Route path='/bets/:questionId/initial'>
-              <BetFirst
-                signer={userProvider.getSigner()}
-                tx={tx}
-                readContracts={readContracts}
-                writeContracts={writeContracts}
-              />
+              <BetFirst signer={userProvider.getSigner()} writeContracts={writeContracts} />
             </Route>
             <Route path='/bets/:questionId/match'>
-              <BetSecond
-                signer={userProvider.getSigner()}
-                tx={tx}
-                readContracts={readContracts}
-                writeContracts={writeContracts}
-              />
+              <BetSecond signer={userProvider.getSigner()} writeContracts={writeContracts} />
             </Route>
             <Route path='/bets/:questionId/community'>
-              <BetCommunity
-                signer={userProvider.getSigner()}
-                tx={tx}
-                readContracts={readContracts}
-                writeContracts={writeContracts}
-              />
+              <BetCommunity signer={userProvider.getSigner()} writeContracts={writeContracts} />
             </Route>
             <Route path='/bets/:questionId/initial-confirmed'>
               <BetConfirmed />
@@ -266,33 +233,18 @@ function App(props) {
             <Route path='/bets/:questionId/community-confirmed'>
               <CommunityConfirmed />
             </Route>
-            <Route path='/bets/:questionId/tokens'>
-              <TokenBalances
+            <Route path='/bets/:questionId/decide-bet'>
+              <DecideBet
                 address={address}
-                localProvider={localProvider}
-                mainnetProvider={mainnetProvider}
-                yourLocalBalance={yourLocalBalance}
-                price={price}
-                readContracts={readContracts}
                 signer={userProvider.getSigner()}
-              />
-            </Route>
-            <Route path='/bets/:questionId/old'>
-              <BetOld
-                address={address}
-                userProvider={userProvider}
-                mainnetProvider={mainnetProvider}
-                localProvider={localProvider}
-                tx={tx}
-                writeContracts={writeContracts}
                 readContracts={readContracts}
+                writeContracts={writeContracts}
               />
             </Route>
             <Route exact path='/bets/:questionId'>
               <BettorHome
                 address={address}
                 signer={userProvider.getSigner()}
-                tx={tx}
                 readContracts={readContracts}
                 writeContracts={writeContracts}
               />
@@ -301,7 +253,6 @@ function App(props) {
         </LoadingContextProvider>
       </BrowserRouter>
 
-      {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
       <div style={{ position: 'fixed', textAlign: 'right', right: 0, top: 0, padding: 10 }}>
         <Account
           address={address}

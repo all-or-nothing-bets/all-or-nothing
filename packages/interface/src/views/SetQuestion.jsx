@@ -5,7 +5,6 @@ import { Button, Card, DatePicker, Form, Input, Space, Typography, notification 
 import { LoadingContext } from '../contexts/loadingContext';
 import { TokenList } from '../components';
 import { parseLocalDateTime } from '../helpers/dateTime';
-import './setQuestion.css';
 
 export default function SetQuestion({ writeContracts }) {
   const history = useHistory();

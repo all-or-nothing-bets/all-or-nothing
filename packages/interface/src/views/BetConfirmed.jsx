@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { parseBytes32String } from '@ethersproject/strings';
 import { isHexString } from '@ethersproject/bytes';
 import { Button, Space, Typography } from 'antd';
-import './betConfirmed.css';
 
 export default function BetConfirmed() {
   const { questionId } = useParams();

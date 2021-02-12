@@ -14,5 +14,6 @@ export { default as MatchConfirmed } from './MatchConfirmed';
 export { default as CommunityConfirmed } from './CommunityConfirmed';
 
 export { default as BettorHome } from './BettorHome';
+export { default as DecideBet } from './DecideBet';
 
 export { default as BetOld } from './BetOld';

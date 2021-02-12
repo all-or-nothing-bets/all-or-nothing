@@ -9,7 +9,6 @@ import { LoadingContext } from '../contexts/loadingContext';
 import { BetEnds, CollateralAmountSelected } from '../components';
 import { useCollateral, useContractAt, useEndDateTime, useInitBets, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
-import './betSecond.css';
 
 export default function BetSecond({ signer, writeContracts }) {
   const history = useHistory();

@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { parseBytes32String } from '@ethersproject/strings';
 import { parseUnits } from '@ethersproject/units';
 import { isHexString } from '@ethersproject/bytes';
@@ -8,9 +8,9 @@ import { LoadingContext } from '../contexts/loadingContext';
 import { BetEnds, BettorBalance, CollateralSelected } from '../components';
 import { useCollateral, useContractAt, useEndDateTime, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
-import './betCommunity.css';
 
 export default function BettorHome({ address, signer, readContracts, writeContracts }) {
+  const history = useHistory();
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
   const { setIsLoading } = useContext(LoadingContext);
@@ -30,6 +30,13 @@ export default function BettorHome({ address, signer, readContracts, writeContra
   if (timestampBN) utcDateTime = new Date(+timestampBN.toString());
 
   const now = new Date();
+  let timeLeft;
+  if (utcDateTime) timeLeft = utcDateTime - now;
+
+  useEffect(() => {
+    if (!utcDateTime) return;
+    if (timeLeft < 0) history.push(`/bets/${questionId}/decide-bet`);
+  }, [utcDateTime]);
 
   const [form] = Form.useForm();
 

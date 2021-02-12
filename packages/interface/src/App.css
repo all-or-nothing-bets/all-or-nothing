@@ -1,4 +1,47 @@
+/* // @import '~antd/dist/antd.less'; */
 /* @import '~antd/dist/antd.css'; */
+
 .App {
   text-align: center;
+}
+
+.ant-radio-group-large .ant-radio-button-wrapper {
+  margin: 10px;
+  height: auto;
+  min-height: 100px;
+  width: 150px;
+  display: flex;
+  flex-direction: vertical;
+  align-items: center;
+  justify-content: center;
+}
+
+.ant-card .ant-card-bordered .ant-card-large {
+  min-height: 100px;
+  width: 150px;
+}
+
+div.ant-row.ant-form-item {
+  display: flex;
+  align-items: center;
+}
+
+.ant-picker {
+  min-width: 300px;
+}
+
+div.collateral {
+  width: 100px;
+  height: 33px;
+  margin: 0 0 23px 0;
+  padding: 3px 0 5px 0;
+  border: 1px solid #d9d9d9;
+  border-radius: 15px;
+}
+
+div.ant-space-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }

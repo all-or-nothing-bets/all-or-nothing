@@ -9,7 +9,6 @@ import { LoadingContext } from '../contexts/loadingContext';
 import { BetEnds, CollateralSelected } from '../components';
 import { useCollateral, useContractAt, useEndDateTime, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
-import './betCommunity.css';
 
 export default function BetCommunity({ signer, writeContracts }) {
   const history = useHistory();

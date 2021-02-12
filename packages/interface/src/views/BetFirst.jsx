@@ -9,7 +9,6 @@ import { LoadingContext } from '../contexts/loadingContext';
 import { CollateralSelected } from '../components';
 import { useCollateral, useContractAt, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
-import './betFirst.css';
 
 export default function BetFirst({ signer, writeContracts }) {
   const history = useHistory();

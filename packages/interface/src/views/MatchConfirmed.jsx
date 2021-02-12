@@ -4,7 +4,6 @@ import { parseBytes32String } from '@ethersproject/strings';
 import { isHexString } from '@ethersproject/bytes';
 import { TwitterShareButton } from 'react-twitter-embed';
 import { Button, Card, Space, Typography } from 'antd';
-import './matchConfirmed.css';
 
 export default function MatchConfirmed() {
   const { questionId } = useParams();
