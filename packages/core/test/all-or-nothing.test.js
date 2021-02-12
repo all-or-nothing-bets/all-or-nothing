@@ -256,13 +256,18 @@ describe("All or Nothing", function () {
         await initBet();
         await secBet();
 
+        // get ERC1155 ids
+        betIds = await eventIds();
+
         //bettor 5 bets on losing side 
         await conditionalTokens.connect(bettor5).setApprovalForAll(wager.address, true);
         await bankBucks.connect(bettor5).approve(wager.address, amount);
-        await wager.connect(bettor5).bet(amount,1);
+        await wager.connect(bettor5).bet(amount,0);
         let bettor5CtsBalance = await conditionalTokens.balanceOf(bettor5.address, betIds[1]);
         console.log("Bettor 5's CT balance", bettor5CtsBalance.toNumber());
-        expect(await conditionalTokens.balanceOf(bettor5.address, betIds[1])).to.equal(amount);
+        let CTFCollateralBettor5 = await bankBucks.balanceOf(conditionalTokens.address);
+        console.log("CTF Balance",CTFCollateralBettor5.toNumber());
+        expect(await conditionalTokens.balanceOf(bettor5.address, betIds[0])).to.equal(amount);
 
         //bettor 3 buys
         await bankBucks.connect(bettor3).approve(wager.address, amount);
@@ -304,6 +309,19 @@ describe("All or Nothing", function () {
         console.log("Bettor 3 collaterla balance post withdraw", bettor3postwithdrawCollateralBalance.toNumber());
         let CTFCollateralPostBettor3 = await bankBucks.balanceOf(conditionalTokens.address);
         console.log("CTF collateral", CTFCollateralPostBettor3.toNumber());
+        let wagerCollateralpostbetwithdraw3 = await bankBucks.balanceOf(wager.address);
+        console.log("Wager collateral", wagerCollateralpostbetwithdraw3.toNumber());
+
+        //bettor 5 withdraw. 
+        //init bettor 1 withdraw
+        await conditionalTokens.connect(bettor5).setApprovalForAll(wager.address, true);
+        await wager.connect(bettor5).withdraw();
+        let bettor5collateral = await bankBucks.balanceOf(bettor5.address);
+        console.log("bettor 5 collateral", bettor5collateral.toNumber());
+
+        let wagerCollateralpostbetwithdraw4 = await bankBucks.balanceOf(wager.address);
+        console.log("Wager collateral", wagerCollateralpostbetwithdraw4.toNumber());
+
       });
 
 
