@@ -250,10 +250,60 @@ describe("All or Nothing", function () {
         console.log("Bettor 3 collaterla balance post withdraw", bettor3postwithdrawCollateralBalance.toNumber());
         let CTFCollateralPostBettor3 = await bankBucks.balanceOf(conditionalTokens.address);
         console.log("CTF collateral", CTFCollateralPostBettor3.toNumber());
-        //bettor 4 withdrawal
+      });
 
+      it("What is the payout with multiple Bet function users?", async function () {
+        await initBet();
+        await secBet();
 
+        //bettor 5 bets on losing side 
+        await conditionalTokens.connect(bettor5).setApprovalForAll(wager.address, true);
+        await bankBucks.connect(bettor5).approve(wager.address, amount);
+        await wager.connect(bettor5).bet(amount,1);
+        let bettor5CtsBalance = await conditionalTokens.balanceOf(bettor5.address, betIds[1]);
+        console.log("Bettor 5's CT balance", bettor5CtsBalance.toNumber());
+        expect(await conditionalTokens.balanceOf(bettor5.address, betIds[1])).to.equal(amount);
 
+        //bettor 3 buys
+        await bankBucks.connect(bettor3).approve(wager.address, amount);
+        await wager.connect(bettor3).buy(100,0);
+
+        //bettor 4 buys
+        await bankBucks.connect(bettor4).approve(wager.address, amount);
+        await wager.connect(bettor4).buy(50,1);
+
+        // get ERC1155 ids
+        betIds = await eventIds();
+          
+        //check bettor3 CT balance position0
+        let bettor3CtBalance = await conditionalTokens.balanceOf(bettor3.address, betIds[0]);
+        console.log("Bettor 3 position 0 balance", bettor3CtBalance.toNumber());
+
+        //Resolve Market
+        await oracle.reportPayout(questionId, [1,0]);
+        await wager.resolve(0, [1,2]);
+
+        //init bettor 1 withdraw
+        await conditionalTokens.connect(bettor1).setApprovalForAll(wager.address, true);
+        await wager.connect(bettor1).withdraw();
+        
+        let bettor1Collateral = await bankBucks.balanceOf(bettor1.address);
+        console.log("Bettor1 ERC20", bettor1Collateral.toNumber());
+        expect(await bankBucks.balanceOf(bettor1.address)).to.equal(400);
+
+        //init bettor 3 withdraw
+        await conditionalTokens.connect(bettor3).setApprovalForAll(wager.address, true);
+        //check collateral remainging in contract
+        let wagerCollateral = await bankBucks.balanceOf(wager.address);
+        console.log("Wager collateral", wagerCollateral.toNumber());
+        
+        let CTFCollateral = await bankBucks.balanceOf(conditionalTokens.address);
+        console.log("CTF collateral", CTFCollateral.toNumber());
+        await wager.connect(bettor3).withdraw();
+        let bettor3postwithdrawCollateralBalance = await bankBucks.balanceOf(bettor3.address);
+        console.log("Bettor 3 collaterla balance post withdraw", bettor3postwithdrawCollateralBalance.toNumber());
+        let CTFCollateralPostBettor3 = await bankBucks.balanceOf(conditionalTokens.address);
+        console.log("CTF collateral", CTFCollateralPostBettor3.toNumber());
       });
 
 
