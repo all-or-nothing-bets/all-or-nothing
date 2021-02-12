@@ -34,6 +34,7 @@ import {
   CommunityConfirmed,
   BettorHome,
   DecideBet,
+  Oracle,
   SetQuestion,
 } from './views';
 // eslint-disable-next-line no-unused-vars
@@ -235,6 +236,14 @@ function App(props) {
             </Route>
             <Route path='/bets/:questionId/decide-bet'>
               <DecideBet
+                address={address}
+                signer={userProvider.getSigner()}
+                readContracts={readContracts}
+                writeContracts={writeContracts}
+              />
+            </Route>
+            <Route path='/bets/:questionId/oracle'>
+              <Oracle
                 address={address}
                 signer={userProvider.getSigner()}
                 readContracts={readContracts}

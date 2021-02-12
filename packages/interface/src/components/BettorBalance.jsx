@@ -5,13 +5,16 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { Card, Typography } from 'antd';
 import { useConditionId, useCollectionId, usePositionId, useCTBalance } from '../hooks';
 import BANKBUCKS_ADDRESS from '../contracts/BankBucks.address';
+import ORACLE_ADDRESS from '../contracts/Oracle.address';
 import { DAI_ADDRESS } from '../constants.js';
 
 export default function BettorBalance({ address, readContracts, questionId, collateral }) {
   const { Title } = Typography;
 
   const { BankBucks, ConditionalTokens } = readContracts || '';
-  const oracle = '0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8'; // oracle
+  // const oracle = '0x41A7C1c354949Eb3a97e4943BD1D5Dc4e12040a8'; // oracle
+  const oracle = ORACLE_ADDRESS; // oracle
+  console.log('oracle address', oracle);
   const outcomes = 2;
   const conditionId = useConditionId(ConditionalTokens, oracle, questionId, outcomes);
 

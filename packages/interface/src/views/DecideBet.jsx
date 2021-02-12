@@ -7,9 +7,10 @@ import { Button, Space, Typography } from 'antd';
 import { LoadingContext } from '../contexts/loadingContext';
 import { BettorBalance } from '../components';
 import { useCollateral, useContractAt, useEndDateTime, useWager } from '../hooks';
-import WagerAbi from '../contracts/Wager.abi';
+import WagerAbi from '../abis/Wager.json';
 
 export default function DecideBet({ address, signer, readContracts, writeContracts }) {
+  const history = useHistory();
   const { setIsLoading } = useContext(LoadingContext);
   const { Title, Text } = Typography;
 
@@ -37,9 +38,9 @@ export default function DecideBet({ address, signer, readContracts, writeContrac
 
   return (
     <div style={{ border: '1px solid #cccccc', padding: 16, width: 500, margin: 'auto', marginTop: 32 }}>
-      <Title level={2}>Congratulations / It's not your lucky day</Title>
-      <div style={{ fontSize: 100, marginBottom: 20 }}>🤑 💩</div>
-      <Title level={4}>You've won / Sorry you didn't win anything</Title>
+      <Title level={2}>Congratulations</Title>
+      <div style={{ fontSize: 80, marginBottom: 20 }}>🤑</div>
+      <Title level={4}>You've won</Title>
       <div style={{ margin: '30px 5px 30px 5px' }}>
         <BettorBalance
           address={address}
@@ -54,7 +55,7 @@ export default function DecideBet({ address, signer, readContracts, writeContrac
         </Button>
         <Title level={5}>{question}</Title>
       </Space>
-      <Title level={4}>Correct answer: YES / NO</Title>
+      <Title level={4}>Correct answer: YES</Title>
       <Text type='secondary'>This bet ended on {localDateTime}</Text>
     </div>
   );

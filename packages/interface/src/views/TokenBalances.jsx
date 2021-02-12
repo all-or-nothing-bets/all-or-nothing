@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { formatEther } from '@ethersproject/units';
 import { Divider } from 'antd';
 import { Address, Balance, TokenBalance, ConditionalTokenBalance } from '../components';
-import WagerAbi from '../contracts/Wager.abi';
+import WagerAbi from '../abis/Wager.json';
 
 import { useContractAt, useWager } from '../hooks';
 
