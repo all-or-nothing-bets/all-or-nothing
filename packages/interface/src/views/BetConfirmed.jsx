@@ -12,7 +12,7 @@ export default function BetConfirmed() {
   const withdrawBet = () => console.log('withdrawBet'); // to do: to implement withdraw
   const path = `/bets/${questionId}`;
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 32 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 500, margin: 'auto', marginTop: 32 }}>
       <Title>Bet locked</Title>
       <Space direction='vertical' size='large'>
         <Text type='secondary'>Fingers crossed!</Text>

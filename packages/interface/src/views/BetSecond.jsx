@@ -11,7 +11,7 @@ import { useCollateral, useContractAt, useEndDateTime, useInitBets, useWager } f
 import WagerAbi from '../contracts/Wager.abi';
 import './betSecond.css';
 
-export default function BetSecond({ signer, tx, readContracts, writeContracts }) {
+export default function BetSecond({ signer, writeContracts }) {
   const history = useHistory();
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
@@ -47,11 +47,10 @@ export default function BetSecond({ signer, tx, readContracts, writeContracts })
         notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
       });
       BankBucks.once('Approval', (owner, spender, value) => {
-        notification.success({ message: `Success: approved ERC20token transfer!`, placement: 'bottomRight' });
+        notification.success({ message: `Success: approved ERC20 token transfer!`, placement: 'bottomRight' });
         console.log(`Approval, owner ${owner} spender ${spender} value ${value}`);
         setIsLoading(false);
       });
-
       setApproved(true);
       setError(null);
     } catch (error) {
@@ -69,9 +68,7 @@ export default function BetSecond({ signer, tx, readContracts, writeContracts })
         const { answer } = data;
         const indexSet = answer === 'yes' ? 1 : 0;
         console.log(`answer ${answer} indexSet ${indexSet} firstBet ${firstBet}`);
-
         await wagerInstance.bet(parseUnits(firstBet), indexSet);
-
         notification.info({ message: 'Placing bet', placement: 'bottomRight' });
         wagerInstance.once('error', error => {
           notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
@@ -89,8 +86,6 @@ export default function BetSecond({ signer, tx, readContracts, writeContracts })
     }
   };
 
-  const resetFields = () => form.resetFields();
-
   let firstBetOutcomes;
   let firstBet;
   let answer;
@@ -102,7 +97,7 @@ export default function BetSecond({ signer, tx, readContracts, writeContracts })
     answer = firstBetOutcomes[0].toString() === '1' ? 'No' : 'Yes';
   }
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 32 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 500, margin: 'auto', marginTop: 32 }}>
       <Title level={2}>{question}</Title>
       <Form form={form}>
         <Title level={4}>Place your bet:</Title>

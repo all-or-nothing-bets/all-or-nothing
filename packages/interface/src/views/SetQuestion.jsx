@@ -24,8 +24,6 @@ export default function SetQuestion({ writeContracts }) {
     const yes = `${interrogative} ${subject} ${rest}`;
     const no = `${interrogative} ${subject} not ${rest}`;
     if (words.length) setPhrase({ yes: yes, no: no });
-    // const phrase = `${interrogative} ${subject} ${rest} OR ${interrogative} ${subject} not ${rest}?`;
-    // if (words.length) setInput(phrase);
   };
 
   const handleCreateBet = async () => {
@@ -35,7 +33,6 @@ export default function SetQuestion({ writeContracts }) {
       const { collateral, question, dateTime } = data;
       const questionId = formatBytes32String(question);
       const timestamp = parseLocalDateTime(dateTime.toDate()); // parsed UTC i.e. in milliseconds
-      console.log('timestamp', timestamp);
       await WagerFactory.create(collateral, questionId, timestamp);
       notification.info({ message: 'Setting market question', placement: 'bottomRight' });
       WagerFactory.once('error', error => {
@@ -77,7 +74,7 @@ export default function SetQuestion({ writeContracts }) {
                 <em>{phrase.yes}</em>
               </Title>
             </Card>
-            <Title level={4}>OR</Title>
+            <Title level={5}>or</Title>
             <Card size='large'>
               <Title level={5}>
                 <em>{phrase.no}</em>

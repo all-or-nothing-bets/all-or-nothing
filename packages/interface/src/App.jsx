@@ -32,6 +32,7 @@ import {
   BetConfirmed,
   MatchConfirmed,
   CommunityConfirmed,
+  BettorHome,
   BetOld,
   SetQuestion,
   TokenBalances,
@@ -211,7 +212,7 @@ function App(props) {
       {networkDisplay}
       <BrowserRouter>
         <LoadingContextProvider>
-          <Menu style={{ textAlign: 'center' }} selectedKeys={[route]} mode='horizontal'>
+          {/* <Menu style={{ textAlign: 'center' }} selectedKeys={[route]} mode='horizontal'>
             <Menu.Item key='/'>
               <Link
                 onClick={() => {
@@ -222,8 +223,7 @@ function App(props) {
                 Set Question
               </Link>
             </Menu.Item>
-          </Menu>
-
+          </Menu> */}
           <Switch>
             <Route exact path='/'>
               <SetQuestion
@@ -288,6 +288,15 @@ function App(props) {
                 readContracts={readContracts}
               />
             </Route>
+            <Route exact path='/bets/:questionId'>
+              <BettorHome
+                address={address}
+                signer={userProvider.getSigner()}
+                tx={tx}
+                readContracts={readContracts}
+                writeContracts={writeContracts}
+              />
+            </Route>
           </Switch>
         </LoadingContextProvider>
       </BrowserRouter>
@@ -310,7 +319,7 @@ function App(props) {
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       <div style={{ position: 'fixed', textAlign: 'left', left: 0, bottom: 20, padding: 10 }}>
-        <Row align='middle' gutter={[4, 4]}>
+        {/* <Row align='middle' gutter={[4, 4]}>
           <Col span={8}>
             <Ramp price={price} address={address} networks={NETWORKS} />
           </Col>
@@ -332,7 +341,7 @@ function App(props) {
               Support
             </Button>
           </Col>
-        </Row>
+        </Row> */}
 
         <Row align='middle' gutter={[4, 4]}>
           <Col span={24}>

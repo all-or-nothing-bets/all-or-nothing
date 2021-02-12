@@ -1,18 +1,16 @@
 import React, { useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useHistory } from 'react-router-dom';
 import { parseBytes32String } from '@ethersproject/strings';
 import { parseUnits } from '@ethersproject/units';
 import { isHexString } from '@ethersproject/bytes';
 import { Button, Form, Radio, Space, Typography, notification } from 'antd';
 import { LoadingContext } from '../contexts/loadingContext';
-import { BetEnds, CollateralSelected } from '../components';
+import { BetEnds, BettorBalance, CollateralSelected } from '../components';
 import { useCollateral, useContractAt, useEndDateTime, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
 import './betCommunity.css';
 
-export default function BetCommunity({ signer, writeContracts }) {
-  const history = useHistory();
+export default function BettorHome({ address, signer, readContracts, writeContracts }) {
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
   const { setIsLoading } = useContext(LoadingContext);
@@ -30,6 +28,8 @@ export default function BetCommunity({ signer, writeContracts }) {
   const timestampBN = useEndDateTime(wagerInstance, wagerAddress); // BigNumber timestamp
   let utcDateTime;
   if (timestampBN) utcDateTime = new Date(+timestampBN.toString());
+
+  const now = new Date();
 
   const [form] = Form.useForm();
 
@@ -66,15 +66,15 @@ export default function BetCommunity({ signer, writeContracts }) {
         const { amount, answer } = data;
         const indexSet = answer === 'yes' ? 1 : 0;
         await wagerInstance.buy(parseUnits(amount), indexSet);
-        notification.info({ message: 'Placing bet', placement: 'bottomRight' });
+        notification.info({ message: 'Increasing bet', placement: 'bottomRight' });
         wagerInstance.once('error', error => {
           notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
         });
         wagerInstance.once('LogCommunityBet', (better, amount, outcomeIndex) => {
-          notification.success({ message: `Success: bet placed!`, placement: 'bottomRight' });
+          notification.success({ message: `Success: bet increased!`, placement: 'bottomRight' });
           console.log(`LogCommunityBet, better ${better} amount ${amount} outcomeIndex ${outcomeIndex}`);
           setIsLoading(false);
-          history.push(`/bets/${questionId}/community-confirmed`);
+          window.location.reload();
         });
       }
     } catch (error) {
@@ -88,20 +88,21 @@ export default function BetCommunity({ signer, writeContracts }) {
   return (
     <div style={{ border: '1px solid #cccccc', padding: 16, width: 500, margin: 'auto', marginTop: 32 }}>
       <Title level={2}>{question}</Title>
+      <BettorBalance address={address} readContracts={readContracts} questionId={questionId} collateral={collateral} />
       <Form form={form}>
-        <Title level={4}>Place your bet:</Title>
+        <Title level={4}>Add to your bet:</Title>
         <div style={{ margin: 8 }}>
           <Form.Item name='answer' rules={[{ required: true }]}>
             <Radio.Group size='large'>
               <Space direction='horizontal'>
                 <Radio.Button value='yes'>
                   <Text style={{ fontSize: 24 }}>
-                    <strong>Yes</strong>, I think so
+                    on <strong>Yes</strong>
                   </Text>
                 </Radio.Button>
                 <Radio.Button value='no'>
                   <Text style={{ fontSize: 24 }}>
-                    <strong>No</strong>, I don't think so
+                    on <strong>No</strong>
                   </Text>
                 </Radio.Button>
               </Space>
@@ -110,7 +111,7 @@ export default function BetCommunity({ signer, writeContracts }) {
         </div>
         <BetEnds utcDateTime={utcDateTime} />
         <div style={{ marginTop: 32 }}>
-          <Title level={4}>How much will you wager?</Title>
+          <Title level={4}>Increase your bet by how much?</Title>
           <CollateralSelected collateral={collateral} handleApprove={handleApprove} />
         </div>
         <Space direction='horizontal'>
@@ -121,7 +122,7 @@ export default function BetCommunity({ signer, writeContracts }) {
           </Form.Item>
           <Form.Item>
             <Button size='large' type='primary' htmlType='button' onClick={handleCreateBet}>
-              Place bet
+              Increase
             </Button>
           </Form.Item>
         </Space>

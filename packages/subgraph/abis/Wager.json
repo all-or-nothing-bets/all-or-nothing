@@ -134,40 +134,11 @@
         "internalType": "uint256",
         "name": "outcomeIndex",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "minOutcomeTokensToBuy",
-        "type": "uint256"
       }
     ],
     "name": "buy",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "outcomeIndex",
-        "type": "uint256"
-      }
-    ],
-    "name": "calcBuyAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
