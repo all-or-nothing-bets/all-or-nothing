@@ -10,7 +10,7 @@ export default function LoadingContextProvider({ children }) {
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
       <LoadingOverlay
         styles={{
-          wrapper: { height: '95vh' },
+          wrapper: { height: '100vh', marginBottom: -30 },
         }}
         active={isLoading}
       >

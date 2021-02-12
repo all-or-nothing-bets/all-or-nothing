@@ -4,7 +4,6 @@ import { parseBytes32String } from '@ethersproject/strings';
 import { isHexString } from '@ethersproject/bytes';
 import { TwitterShareButton } from 'react-twitter-embed';
 import { Button, Card, Space, Typography } from 'antd';
-import './matchConfirmed.css';
 
 export default function MatchConfirmed() {
   const { questionId } = useParams();
@@ -15,7 +14,7 @@ export default function MatchConfirmed() {
   const path = `/bets/${questionId}`;
   const tweet = `We have a wager on "${question}" - Care to join us?`;
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 32 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 500, margin: 'auto', marginTop: 32 }}>
       <Title>Bet confirmed</Title>
       <Space direction='vertical' size='large'>
         <Text type='secondary'>Fingers crossed!</Text>

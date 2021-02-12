@@ -1,16 +1,15 @@
-import React, { useContext, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useHistory } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { parseBytes32String } from '@ethersproject/strings';
-import { formatUnits, parseUnits } from '@ethersproject/units';
+import { parseUnits } from '@ethersproject/units';
 import { isHexString } from '@ethersproject/bytes';
 import { Button, Form, Radio, Space, Typography, notification } from 'antd';
 import { LoadingContext } from '../contexts/loadingContext';
-import { BetEnds, CollateralAmountSelected } from '../components';
-import { useCollateral, useContractAt, useEndDateTime, useInitBets, useWager } from '../hooks';
+import { BetEnds, BettorBalance, CollateralSelected } from '../components';
+import { useCollateral, useContractAt, useEndDateTime, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
 
-export default function BetSecond({ signer, writeContracts }) {
+export default function BettorHome({ address, signer, readContracts, writeContracts }) {
   const history = useHistory();
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
@@ -30,7 +29,14 @@ export default function BetSecond({ signer, writeContracts }) {
   let utcDateTime;
   if (timestampBN) utcDateTime = new Date(+timestampBN.toString());
 
-  const initBets = useInitBets(wagerInstance, wagerAddress);
+  const now = new Date();
+  let timeLeft;
+  if (utcDateTime) timeLeft = utcDateTime - now;
+
+  useEffect(() => {
+    if (!utcDateTime) return;
+    if (timeLeft < 0) history.push(`/bets/${questionId}/decide-bet`);
+  }, [utcDateTime]);
 
   const [form] = Form.useForm();
 
@@ -39,7 +45,7 @@ export default function BetSecond({ signer, writeContracts }) {
     try {
       const data = await form.validateFields();
       // need to import relevant collateral contracts and use them, not BankBucks
-      await BankBucks.approve(wagerInstance.address, parseUnits(firstBet));
+      await BankBucks.approve(wagerInstance.address, parseUnits(data.amount));
 
       notification.info({ message: 'Approving ERC20 token transfer', placement: 'bottomRight' });
       BankBucks.once('error', error => {
@@ -58,25 +64,24 @@ export default function BetSecond({ signer, writeContracts }) {
     }
   };
 
-  const handleMatchBet = async () => {
+  const handleCreateBet = async () => {
     setIsLoading(true);
     try {
       const data = await form.validateFields();
       if (!approved) setError('approving wager is required');
       else {
-        const { answer } = data;
+        const { amount, answer } = data;
         const indexSet = answer === 'yes' ? 1 : 0;
-        console.log(`answer ${answer} indexSet ${indexSet} firstBet ${firstBet}`);
-        await wagerInstance.bet(parseUnits(firstBet), indexSet);
-        notification.info({ message: 'Placing bet', placement: 'bottomRight' });
+        await wagerInstance.buy(parseUnits(amount), indexSet);
+        notification.info({ message: 'Increasing bet', placement: 'bottomRight' });
         wagerInstance.once('error', error => {
           notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
         });
-        wagerInstance.once('LogMatchedBet', (better, amount, outcomeIndex) => {
-          notification.success({ message: `Success: bet matched!`, placement: 'bottomRight' });
-          console.log(`LogMatchedBet, better ${better} amount ${amount} outcomeIndex ${outcomeIndex}`);
+        wagerInstance.once('LogCommunityBet', (better, amount, outcomeIndex) => {
+          notification.success({ message: `Success: bet increased!`, placement: 'bottomRight' });
+          console.log(`LogCommunityBet, better ${better} amount ${amount} outcomeIndex ${outcomeIndex}`);
           setIsLoading(false);
-          history.push(`/bets/${questionId}/match-confirmed`);
+          window.location.reload();
         });
       }
     } catch (error) {
@@ -85,40 +90,46 @@ export default function BetSecond({ signer, writeContracts }) {
     }
   };
 
-  let firstBetOutcomes;
-  let firstBet;
-  let answer;
-  if (initBets) {
-    firstBetOutcomes = initBets[1]; // either 1 yes or 0
-    firstBet = formatUnits(initBets[2]); // ERC20 token amount, BigNumber
-  }
-  if (firstBetOutcomes) {
-    answer = firstBetOutcomes[0].toString() === '1' ? 'No' : 'Yes';
-  }
+  const resetFields = () => form.resetFields();
+
   return (
     <div style={{ border: '1px solid #cccccc', padding: 16, width: 500, margin: 'auto', marginTop: 32 }}>
       <Title level={2}>{question}</Title>
+      <BettorBalance address={address} readContracts={readContracts} questionId={questionId} collateral={collateral} />
       <Form form={form}>
-        <Title level={4}>Place your bet:</Title>
+        <Title level={4}>Add to your bet:</Title>
         <div style={{ margin: 8 }}>
           <Form.Item name='answer' rules={[{ required: true }]}>
             <Radio.Group size='large'>
               <Space direction='horizontal'>
-                <Radio.Button value={answer ? answer.toLowerCase() : ''}>
-                  <Text style={{ fontSize: 24, fontWeight: 600 }}>{answer}</Text>
+                <Radio.Button value='yes'>
+                  <Text style={{ fontSize: 24 }}>
+                    on <strong>Yes</strong>
+                  </Text>
+                </Radio.Button>
+                <Radio.Button value='no'>
+                  <Text style={{ fontSize: 24 }}>
+                    on <strong>No</strong>
+                  </Text>
                 </Radio.Button>
               </Space>
             </Radio.Group>
           </Form.Item>
         </div>
         <BetEnds utcDateTime={utcDateTime} />
-        <div style={{ margin: 16 }}>
-          <CollateralAmountSelected collateral={collateral} amount={firstBet} handleApprove={handleApprove} />
+        <div style={{ marginTop: 32 }}>
+          <Title level={4}>Increase your bet by how much?</Title>
+          <CollateralSelected collateral={collateral} handleApprove={handleApprove} />
         </div>
         <Space direction='horizontal'>
           <Form.Item>
-            <Button size='large' type='primary' htmlType='button' onClick={handleMatchBet}>
-              Match the bet
+            <Button size='large' type='default' htmlType='button' onClick={resetFields}>
+              Reset
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <Button size='large' type='primary' htmlType='button' onClick={handleCreateBet}>
+              Increase
             </Button>
           </Form.Item>
         </Space>

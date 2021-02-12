@@ -10,6 +10,7 @@ module.exports = {
           '@link-color': '#1DA57A',
           '@border-radius-base': '15px',
           '@font-size-base': '16px',
+          '@border-color-base': '#d9d9d9;',
         },
       },
     },

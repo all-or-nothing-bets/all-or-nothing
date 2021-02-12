@@ -2,7 +2,6 @@ import React from 'react';
 import { Button, Form, Input, Space } from 'antd';
 import BANKBUCKS_ADDRESS from '../contracts/BankBucks.address';
 import { DAI_ADDRESS } from '../constants.js';
-import './collateralSelected.css';
 
 export default function CollateralSelected({ handleApprove, collateral }) {
   let symbol;

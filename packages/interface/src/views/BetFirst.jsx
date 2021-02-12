@@ -9,9 +9,8 @@ import { LoadingContext } from '../contexts/loadingContext';
 import { CollateralSelected } from '../components';
 import { useCollateral, useContractAt, useWager } from '../hooks';
 import WagerAbi from '../contracts/Wager.abi';
-import './betFirst.css';
 
-export default function BetFirst({ signer, tx, readContracts, writeContracts }) {
+export default function BetFirst({ signer, writeContracts }) {
   const history = useHistory();
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState();
@@ -25,15 +24,6 @@ export default function BetFirst({ signer, tx, readContracts, writeContracts }) 
   const wagerAddress = useWager(WagerFactory, questionId);
   const wagerInstance = useContractAt(signer, WagerAbi, wagerAddress);
   const collateral = useCollateral(wagerInstance, wagerAddress);
-
-  console.log('wagerAddress', wagerAddress);
-  console.log('collateral', collateral);
-
-  // const oracle = useContractReader(readContracts, 'Wage', 'oracle');
-  // console.log('oracle', oracle);
-  // console.log('WagerAbi', WagerAbi);
-  // console.log('readContracts', readContracts);
-  // console.log('wagerInstance', wagerInstance);
 
   const [form] = Form.useForm();
 
@@ -49,11 +39,10 @@ export default function BetFirst({ signer, tx, readContracts, writeContracts }) 
         notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
       });
       BankBucks.once('Approval', (owner, spender, value) => {
-        notification.success({ message: `Success: approved ERC20token transfer!`, placement: 'bottomRight' });
+        notification.success({ message: `Success: approved ERC20 token transfer!`, placement: 'bottomRight' });
         console.log(`Approval, owner ${owner} spender ${spender} value ${value}`);
         setIsLoading(false);
       });
-
       setApproved(true);
       setError(null);
     } catch (error) {
@@ -71,7 +60,6 @@ export default function BetFirst({ signer, tx, readContracts, writeContracts }) 
         const { amount, answer } = data;
         const indexSet = answer === 'yes' ? 1 : 0;
         await wagerInstance.initialBet(parseUnits(amount), indexSet);
-
         notification.info({ message: 'Placing bet', placement: 'bottomRight' });
         wagerInstance.once('error', error => {
           notification.error({ message: `Error ${error.data?.message || error.message}`, placement: 'bottomRight' });
@@ -92,9 +80,9 @@ export default function BetFirst({ signer, tx, readContracts, writeContracts }) 
   const resetFields = () => form.resetFields();
 
   return (
-    <div style={{ border: '1px solid #cccccc', padding: 16, width: 450, margin: 'auto', marginTop: 32 }}>
+    <div style={{ border: '1px solid #cccccc', padding: 16, width: 500, margin: 'auto', marginTop: 32 }}>
       <Title level={2}>{question}</Title>
-      <Form form={form} initialValues={{ answer: 'no' }}>
+      <Form form={form}>
         <Title level={4}>Place your bet:</Title>
         <div style={{ margin: 8 }}>
           <Form.Item name='answer' rules={[{ required: true }]}>
